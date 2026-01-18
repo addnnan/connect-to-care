@@ -33,9 +33,11 @@ export default function Navbar() {
 
         {/* Desktop Action */}
         <div className="hidden md:flex">
-          <button className="border px-4 py-2 rounded hover:bg-gray-100">
+          <Link to="/login">
+          <button className="border px-4 py-2 rounded hover:bg-gray-100 ">
             Log in
           </button>
+          </Link>
         </div>
 
         {/* Mobile Menu Button */}
@@ -62,10 +64,11 @@ export default function Navbar() {
           <Link to="/about" onClick={() => setMobileMenuOpen(false)}>
             About Us
           </Link>
-
-          <button className="border px-4 py-2 rounded">
-            Sign in
+          <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+          <button className="border px-4 py-2 rounded w-full ">
+            Log in
           </button>
+          </Link>
         </nav>
       )}
     </header>

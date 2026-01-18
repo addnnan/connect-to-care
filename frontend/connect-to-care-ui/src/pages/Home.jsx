@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import {Brain,TestTube, ArrowRight,BookOpen} from "lucide-react";
 
+
 export default function Home() {
   return (
     <>
@@ -28,7 +29,7 @@ export default function Home() {
                 </p>
 
                 <div className="w-full max-w-md mx-auto flex flex-col gap-3 sm:flex-row sm:gap-4 sm:justify-center">
-                  <Link to="/assessment" className="w-full sm:w-auto">
+                  <Link to="/detection" className="w-full sm:w-auto">
                     <button className="w-full flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-6 py-3 text-base font-medium text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
                       Start Detection Test
                       <ArrowRight className="h-5 w-5" />
@@ -128,32 +129,7 @@ export default function Home() {
       </main>
 
       {/* FOOTER */}
-      <footer className="border-t bg-slate-50">
-        <div className="container mx-auto py-10 px-4 flex flex-col md:flex-row gap-8">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 font-semibold">
-              <Brain className="h-6 w-6" />
-              <span>ConnectToCare</span>
-            </div>
-            <p className="text-sm text-gray-500 mt-2">
-              Providing specialized support for autism and ADHD.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 flex-1">
-            {["Resources", "Support", "Legal"].map(section => (
-              <div key={section}>
-                <h3 className="font-semibold mb-2">{section}</h3>
-                
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="border-t py-4 text-center text-sm text-gray-500">
-          © {new Date().getFullYear()} ConnectToCare. All rights reserved.
-        </div>
-      </footer>
+      {/* <Footer /> */}
     </>
   );
 }
