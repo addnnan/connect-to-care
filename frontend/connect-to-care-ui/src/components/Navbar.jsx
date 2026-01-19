@@ -1,6 +1,7 @@
 import  { useState } from "react";
 import { Link } from "react-router-dom";
 import { Brain } from "lucide-react";
+import {motion,AnimatePresence} from "framer-motion";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -50,8 +51,9 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Menu */}
+      <AnimatePresence>
       {mobileMenuOpen && (
-        <nav className="md:hidden flex flex-col gap-4 p-4 bg-white shadow absolute w-full z-50">
+        <motion.nav initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10,transition:{duration:0.1,ease:"easeOut"}}}  className="md:hidden flex flex-col gap-4 p-4 bg-white shadow absolute w-full z-50">
           <Link to="/autism" onClick={() => setMobileMenuOpen(false)}>
             Autism
           </Link>
@@ -69,8 +71,9 @@ export default function Navbar() {
             Log in
           </button>
           </Link>
-        </nav>
+        </motion.nav>
       )}
+      </AnimatePresence>
     </header>
   );
 }

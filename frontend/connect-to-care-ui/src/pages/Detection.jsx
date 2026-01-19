@@ -6,22 +6,27 @@ const questions = [
   {
     id: 1,
     text: "Does the child make eye contact during interaction?",
+    weight: 2,
   },
   {
     id: 2,
     text: "Does the child respond when their name is called?",
+    weight: 1.5,
   },
   {
     id: 3,
     text: "Does the child show interest in playing with others?",
+    weight: 1,
   },
   {
     id: 4,
     text: "Does the child use gestures such as pointing or waving?",
+    weight: 1,
   },
   {
     id: 5,
     text: "Does the child repeat certain behaviors frequently?",
+    weight: 1.5,
   },
 ];
 
@@ -32,6 +37,25 @@ export default function Assessment() {
 
   const totalQuestions = questions.length;
   const currentQuestion = questions[currentStep];
+  
+  const calculateResult = () => {
+    let score = 0;
+
+    questions.forEach((q) => {
+      if (answers[q.id] === true) {
+        score += q.weight;
+      }
+    });
+
+    let risk = "Low";
+    if (score >= 4) risk = "Medium";
+    if (score >= 6) risk = "High";
+
+    return { score, risk };
+  };
+ 
+
+
 
   const handleAnswer = (value) => {
     setAnswers({
@@ -46,7 +70,8 @@ export default function Assessment() {
     } else {
       // Later this will send data to AI backend
       console.log("Assessment answers:", answers);
-      navigate("/result"); // placeholder
+      const result = calculateResult();
+      navigate("/result", { state: result }); // placeholder
     }
   };
 
@@ -130,7 +155,7 @@ export default function Assessment() {
           <button
             onClick={handleNext}
             disabled={answers[currentQuestion.id] === undefined}
-            className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 text-white text-sm font-medium hover:bg-emerald-700 transition disabled:opacity-50"
+            className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 text-white text-sm font-medium hover:bg-emerald-700 transition cursor-pointer"
           >
             {currentStep === totalQuestions - 1 ? "Submit" : "Next"}
             <ArrowRight className="h-4 w-4" />

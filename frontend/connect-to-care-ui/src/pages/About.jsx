@@ -1,8 +1,9 @@
 import { Brain, ShieldCheck, Users, Target } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function About() {
   return (
-    <main className="bg-gray-50">
+    <motion.main initial = {{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-gray-50">
 
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-emerald-50 to-white py-20 px-4">
@@ -114,6 +115,6 @@ export default function About() {
 
         </div>
       </section>
-    </main>
+    </motion.main>
   );
 }

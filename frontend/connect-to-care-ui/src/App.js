@@ -6,6 +6,9 @@ import Detection from './pages/Detection';
 import DetailedAssessment from './pages/DetailedAssessment';
 import { Footer } from './components/Footer';
 import About from './pages/About';
+import Result from './pages/result';
+import ADHD from './pages/ADHD';
+import Autism from './pages/Autism';
 
 function App() {
   const location = useLocation();
@@ -18,6 +21,9 @@ function App() {
         <Route path="/login" element={<Login/>} />
         <Route path="/detection" element={<Detection/>} />
         <Route path="/detection/detailed" element={<DetailedAssessment/>} />
+        <Route path= "/result" element= {<Result/>} />
+        <Route path="/ADHD" element={<ADHD/>} />
+        <Route path="/autism" element={<Autism/>} />
         <Route path="about" element={<About/>} />
       </Routes>
       <Footer />

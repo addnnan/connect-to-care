@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
 import { Brain, ArrowRight, ArrowLeft } from "lucide-react";
+import {motion} from "framer-motion";
 
 export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-6 sm:p-8">
+      <motion.div initial = {{ opacity: 0, y: 0 }} animate = {{ opacity: 1, y: 0 }} className="w-full max-w-md bg-white rounded-2xl shadow-lg p-6 sm:p-8">
 
      <Link
           to="/"
@@ -93,7 +94,7 @@ export default function Login() {
           This platform provides screening support and does not replace
           professional medical diagnosis.
         </p>
-      </div>
+      </motion.div>
     </div>
   );
 }
