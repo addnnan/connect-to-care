@@ -4,31 +4,44 @@ import { Link, useNavigate } from "react-router-dom";
 
 const questions = [
   {
-    id: 1,
-    text: "Does the child make eye contact during interaction?",
-    weight: 2,
+    id: "eye_contact",
+    text: "Avoids or struggles to maintain eye contact",
+    domain: "social",
   },
   {
-    id: 2,
-    text: "Does the child respond when their name is called?",
-    weight: 1.5,
+    id: "name_response",
+    text: "Does not consistently respond when name is called",
+    domain: "communication",
   },
   {
-    id: 3,
-    text: "Does the child show interest in playing with others?",
-    weight: 1,
+    id: "peer_play",
+    text: "Has difficulty engaging in play with others",
+    domain: "social",
   },
   {
-    id: 4,
-    text: "Does the child use gestures such as pointing or waving?",
-    weight: 1,
+    id: "gestures",
+    text: "Rarely uses gestures such as pointing or waving",
+    domain: "communication",
   },
   {
-    id: 5,
-    text: "Does the child repeat certain behaviors frequently?",
-    weight: 1.5,
+    id: "repetitive",
+    text: "Repeats the same actions or behaviors frequently",
+    domain: "repetitive",
+  },
+  {
+    id: "routine_change",
+    text: "Becomes distressed by changes in routine",
+    domain: "sensory",
   },
 ];
+const scaleOptions = [
+  { label: "Never", value: 0 },
+  { label: "Rarely", value: 1 },
+  { label: "Sometimes", value: 2 },
+  { label: "Often", value: 3 },
+  { label: "Always", value: 4 },
+];
+
 
 export default function Assessment() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -39,20 +52,32 @@ export default function Assessment() {
   const currentQuestion = questions[currentStep];
   
   const calculateResult = () => {
-    let score = 0;
+    const domainScores = {};
 
     questions.forEach((q) => {
-      if (answers[q.id] === true) {
-        score += q.weight;
-      }
+      domainScores[q.domain] ??= [];
+      domainScores[q.domain].push(answers[q.id]);
     });
 
-    let risk = "Low";
-    if (score >= 4) risk = "Medium";
-    if (score >= 6) risk = "High";
+    const domainPercentages = {};
 
-    return { score, risk };
+    for (const domain in domainScores) {
+      const total = domainScores[domain].reduce((a, b) => a + b, 0);
+      const max = domainScores[domain].length * 4;
+      domainPercentages[domain] = Math.round((total / max) * 100);
+    }
+
+    const finalScore =
+      Object.values(domainPercentages).reduce((a, b) => a + b, 0) /
+      Object.values(domainPercentages).length;
+
+    let risk = "Low";
+    if (finalScore > 60) risk = "High";
+    else if (finalScore > 30) risk = "Moderate";
+
+    return { finalScore: Math.round(finalScore), risk, domainPercentages };
   };
+
  
 
 
@@ -71,7 +96,27 @@ export default function Assessment() {
       // Later this will send data to AI backend
       console.log("Assessment answers:", answers);
       const result = calculateResult();
-      navigate("/result", { state: result }); // placeholder
+      console.log("Calculated result:", result);
+      // navigate("/result", { state: result }); // placeholder
+      const assessmentRecord = {
+      id: Date.now(),
+      date: new Date().toISOString(),
+      result: result.risk || result.likelihood,
+      score: result.score ?? null,
+      confidence: result.confidence ?? null,
+      details: result,
+    };
+
+    const existing =
+      JSON.parse(localStorage.getItem("connect_to_care_assessments")) || [];
+
+    localStorage.setItem(
+      "connect_to_care_assessments",
+      JSON.stringify([assessmentRecord, ...existing])
+    );
+
+    navigate(`/result/${assessmentRecord.id}`, { state: result });
+
     }
   };
 
@@ -115,31 +160,23 @@ export default function Assessment() {
         </h2>
 
         {/* Answer Buttons */}
-        <div className="flex flex-col gap-3 mb-8">
+        <div className="flex flex-col gap-2 mb-8">
+        {scaleOptions.map((opt) => (
           <button
-            onClick={() => handleAnswer(true)}
+            key={opt.value}
+            onClick={() => handleAnswer(opt.value)}
             className={`w-full rounded-lg border px-4 py-3 text-left transition
               ${
-                answers[currentQuestion.id] === true
+                answers[currentQuestion.id] === opt.value
                   ? "border-emerald-600 bg-emerald-50 text-emerald-700"
                   : "border-gray-300 hover:bg-gray-50"
               }`}
           >
-            Yes
+            {opt.label}
           </button>
+        ))}
+      </div>
 
-          <button
-            onClick={() => handleAnswer(false)}
-            className={`w-full rounded-lg border px-4 py-3 text-left transition
-              ${
-                answers[currentQuestion.id] === false
-                  ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                  : "border-gray-300 hover:bg-gray-50"
-              }`}
-          >
-            No
-          </button>
-        </div>
 
         {/* Navigation */}
         <div className="flex items-center justify-between">
@@ -154,8 +191,8 @@ export default function Assessment() {
 
           <button
             onClick={handleNext}
-            disabled={answers[currentQuestion.id] === undefined}
-            className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 text-white text-sm font-medium hover:bg-emerald-700 transition cursor-pointer"
+            disabled={answers[currentQuestion.id] === undefined || currentStep === totalQuestions}
+            className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 text-white text-sm font-medium hover:bg-emerald-700 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {currentStep === totalQuestions - 1 ? "Submit" : "Next"}
             <ArrowRight className="h-4 w-4" />

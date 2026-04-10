@@ -13,8 +13,8 @@ export default function Home() {
             <div className="flex flex-col items-center text-center gap-14">
 
               <div className="space-y-6">
-                <span className="text-xl flex items-center justify-center gap-2 text-black-500 font-semibold">
-                  <Brain className="h-6 w-6 text-black-600" />
+                <span className="md:text-xl text-sm flex items-center justify-center gap-2 text-black-500 font-semibold">
+                  <Brain className="h-4 w-4 text-black-600 md:h-6 md:w-6" />
                   Specialized Therapy for Autism & ADHD
                 </span>
 
@@ -73,7 +73,7 @@ export default function Home() {
                   <p className="text-center text-gray-600">
                     Interactive strategies for ADHD.
                   </p>
-                  <Link to="/dyslexia">
+                  <Link to="/adhd">
                     <button className="flex items-center gap-2 border border-blue-400 text-blue-600 px-4 py-2 rounded-md hover:bg-blue-50 transition">
                       Explore Modules
                       <ArrowRight className="h-4 w-4" />

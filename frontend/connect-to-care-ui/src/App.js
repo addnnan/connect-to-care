@@ -9,6 +9,9 @@ import About from './pages/About';
 import Result from './pages/result';
 import ADHD from './pages/ADHD';
 import Autism from './pages/Autism';
+import AIresult from './pages/AIresult';
+import Dashboard from './pages/Dashboard';
+
 
 function App() {
   const location = useLocation();
@@ -21,10 +24,12 @@ function App() {
         <Route path="/login" element={<Login/>} />
         <Route path="/detection" element={<Detection/>} />
         <Route path="/detection/detailed" element={<DetailedAssessment/>} />
-        <Route path= "/result" element= {<Result/>} />
+        <Route path= "/result/:id" element= {<Result/>} />
         <Route path="/ADHD" element={<ADHD/>} />
         <Route path="/autism" element={<Autism/>} />
         <Route path="about" element={<About/>} />
+        <Route path="detailed-result" element={<AIresult/>} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
       <Footer />
     </div>

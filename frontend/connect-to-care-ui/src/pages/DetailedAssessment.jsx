@@ -1,9 +1,13 @@
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import {  z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Sparkles,Brain} from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+
+
 
 const assessmentSchema = z.object({
   title: z.string().min(3, "Title is required"),
@@ -11,6 +15,7 @@ const assessmentSchema = z.object({
 });
 
 export default function DetailedAssessment() {
+  const [loading, setLoading] = useState(false);
   const form = useForm({
     resolver: zodResolver(assessmentSchema),
     defaultValues: {
@@ -18,11 +23,42 @@ export default function DetailedAssessment() {
       notes: "",
     },
   });
+  const navigate = useNavigate();
+  const onSubmit = async (data) => {
+  try {
+    setLoading(true);
+    const res = await fetch("http://127.0.0.1:8000/api/analyze", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        text: data.notes,
+      }),
+    });
 
-  const onSubmit = (data) => {
-    console.log("Observation data for AI:", data);
-    // later → send to AI backend
-  };
+    console.log("STATUS:", res.status);
+
+    const rawText = await res.text();
+    console.log("RAW RESPONSE:", rawText);
+
+    if (!res.ok) {
+      throw new Error(`Backend error ${res.status}`);
+    }
+
+    const result = JSON.parse(rawText);
+
+    navigate("/detailed-result", {
+      state: result,
+    });
+  } catch (err) {
+    console.error("ERROR:", err);
+    alert("Something went wrong while analyzing the assessment.");
+    setLoading(false);
+  }
+};
+
+
 
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-12">
@@ -91,11 +127,12 @@ export default function DetailedAssessment() {
             {/* Submit */}
             <div className="flex justify-end">
               <button
+                disabled={loading}
                 type="submit"
-                className="flex items-center gap-2 rounded-lg bg-emerald-600 px-6 py-3 text-white hover:bg-emerald-700 transition"
+                className="flex items-center gap-2 rounded-lg bg-emerald-600 px-6 py-3 text-white hover:bg-emerald-700 transition disabled:opacity-50   "
               >
                 <Brain className="h-4 w-4" />
-                Run AI Analysis
+                {loading?"Analyzing...":"Run AI Analysis"}
               </button>
             </div>
           </form>

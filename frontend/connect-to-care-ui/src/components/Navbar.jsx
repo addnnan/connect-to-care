@@ -7,8 +7,8 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="border-b relative">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
+    <header className="border-b relative ">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6 ">
 
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 font-semibold">
@@ -35,11 +35,22 @@ export default function Navbar() {
         {/* Desktop Action */}
         <div className="hidden md:flex">
           <Link to="/login">
-          <button className="border px-4 py-2 rounded hover:bg-gray-100 ">
-            Log in
+          <button className="
+          rounded-lg
+          border border-emerald-600
+          px-4 py-2
+          text-sm font-medium
+          text-emerald-700
+          transition
+          hover:bg-emerald-50
+          hover:text-emerald-800
+          focus:outline-none focus:ring-2 focus:ring-emerald-500
+        ">
+          Log in
           </button>
-          </Link>
-        </div>
+        </Link>
+      </div>
+
 
         {/* Mobile Menu Button */}
         <button
