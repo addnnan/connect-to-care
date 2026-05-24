@@ -89,7 +89,7 @@ export default function Result() {
           <div
             className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full ${config.bg}`}
           >
-            <Icon className="h-8 w-8 text-gray-800" />
+            <Icon className="h-8 w-8 text-red-500" />
           </div>
 
           <h1 className="text-3xl font-semibold text-gray-900">
@@ -184,7 +184,7 @@ export default function Result() {
             className="flex items-center justify-between rounded-lg border px-5 py-4 hover:bg-gray-50 transition"
           >
             <span className="font-medium text-gray-800">
-              Explore recommended support resources
+              Find nearest healthcare professionals
             </span>
             <ArrowRight className="h-4 w-4 text-gray-500" />
           </Link>
