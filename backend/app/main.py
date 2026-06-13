@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from app.ai.openai_eval import analyze_text
 from fastapi.middleware.cors import CORSMiddleware
+from app.routes.assessment import router
 
 app = FastAPI()
 
@@ -16,6 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(router)
 
 class AssessmentRequest(BaseModel):
     text: str

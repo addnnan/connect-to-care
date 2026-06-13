@@ -29,7 +29,7 @@ export default function Home() {
                 </p>
 
                 <div className="w-full max-w-md mx-auto flex flex-col gap-3 sm:flex-row sm:gap-4 sm:justify-center">
-                  <Link to="/detection" className="w-full sm:w-auto">
+                  <Link to="/assessments" className="w-full sm:w-auto">
                     <button className="w-full flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-6 py-3 text-base font-medium text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
                       Start Detection Test
                       <ArrowRight className="h-5 w-5" />

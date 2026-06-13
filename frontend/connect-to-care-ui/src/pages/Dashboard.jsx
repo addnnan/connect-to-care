@@ -1,5 +1,8 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import {useState, useEffect} from "react";
+import api from "../services/api";
+
 import {
   Brain,
   FileText,
@@ -9,9 +12,26 @@ import {
 
 export default function Dashboard() {
   // TEMP: replace later with backend / localStorage
-  const assessments = JSON.parse(localStorage.getItem("connect_to_care_assessments")) || [];
+  const [assessments, setAssessments] = useState([]);
+
+  useEffect(() => {
+    loadAssessments();
+  }, []);
+
+  const loadAssessments = async () => {
+    const response =
+      await api.get("/assessments");
+
+    setAssessments(response.data);
+};
+
+
+
+
+  // const assessments = JSON.parse(localStorage.getItem("connect_to_care_assessments")) || [];
 
   const latestAssessment = assessments[0];
+
 
 
 
@@ -45,7 +65,7 @@ export default function Dashboard() {
               {latestAssessment?.result ?? "No assessment yet"}
             </h2>
             <p className="text-sm text-gray-500 mt-1">
-              {latestAssessment?.date ?? "—"}
+              {latestAssessment?.date ? new Date(latestAssessment.date).toLocaleString() : "—"}
             </p>
           </div>
 
@@ -80,20 +100,24 @@ export default function Dashboard() {
             <ul className="divide-y">
               {assessments.map((item) => (
                 <li
-                  key={item.id}
+                  key={item._id}
                   className="flex items-center justify-between py-4"
                 >
                   <div>
-                    <p className="text-sm font-medium text-gray-900">
+                   <p className="text-md font-semibold text-gray-900">
+                      {item.type === "autism" ? "Autism" : "ADHD"} Assessment
+                    </p>
+
+                    <p className="text-xs text-gray-600">
                       {item.result} likelihood
                     </p>
                     <p className="text-xs text-gray-500">
-                      {item.date}
+                      {new Date(item.date).toLocaleString()}
                     </p>
                   </div>
 
                   <Link
-                    to={`/result/${item.id}`}
+                    to={`/result/${item._id}`}
                     state={item}
                     className="inline-flex items-center gap-1 text-sm text-emerald-600 hover:underline"
                   >
@@ -114,7 +138,7 @@ export default function Dashboard() {
           className="grid sm:grid-cols-2 gap-6"
         >
           <Link
-            to="/detection"
+            to="/assessments"
             className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition"
           >
             <Brain className="h-6 w-6 text-emerald-600 mb-3" />

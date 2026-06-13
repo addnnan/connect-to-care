@@ -65,7 +65,7 @@ export default function DetailedAssessment() {
       <div className="max-w-3xl mx-auto">
 
         <Link
-          to="/detection"
+          to="/assessments"
           className="inline-flex items-center text-sm text-gray-600 hover:text-emerald-600 mb-6"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />

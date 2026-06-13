@@ -24,7 +24,7 @@ export default function Navbar() {
           <Link to="/ADHD" className="text-sm font-medium hover:underline">
             ADHD
           </Link>
-          <Link to="/detection" className="text-sm font-medium hover:underline">
+          <Link to="/assessments" className="text-sm font-medium hover:underline">
             Detection Test
           </Link>
           <Link to="/about" className="text-sm font-medium hover:underline">

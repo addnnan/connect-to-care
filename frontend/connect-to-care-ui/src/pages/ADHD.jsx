@@ -139,7 +139,7 @@ export default function ADHDModule() {
 
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
-                to="/doctors"
+                to="/care-guidance/adhd"
                 className="flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-6 py-3 text-white hover:bg-indigo-700 transition"
               >
                 Find a healthcare professional

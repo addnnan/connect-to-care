@@ -11,6 +11,9 @@ import ADHD from './pages/ADHD';
 import Autism from './pages/Autism';
 import AIresult from './pages/AIresult';
 import Dashboard from './pages/Dashboard';
+import AssessmentSelection from './pages/AssessmentSelection';
+import CareGuidance from './pages/CareGuidance';
+import MChatFollowUp from './pages/MChartFollowUp';
 
 
 function App() {
@@ -22,7 +25,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login/>} />
-        <Route path="/detection" element={<Detection/>} />
+        {/* <Route path="/detection" element={<Detection/>} /> */}
         <Route path="/detection/detailed" element={<DetailedAssessment/>} />
         <Route path= "/result/:id" element= {<Result/>} />
         <Route path="/ADHD" element={<ADHD/>} />
@@ -30,6 +33,10 @@ function App() {
         <Route path="about" element={<About/>} />
         <Route path="detailed-result" element={<AIresult/>} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/assessments" element={<AssessmentSelection />} />
+       <Route path="/assessment/mchat-followup" element={<MChatFollowUp />} />
+        <Route path="/assessment/:type" element={<Detection />}/>
+        <Route path="/care-guidance/:type" element={<CareGuidance />}/>
       </Routes>
       <Footer />
     </div>

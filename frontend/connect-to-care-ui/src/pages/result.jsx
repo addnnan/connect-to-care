@@ -1,5 +1,8 @@
 import {  Link, useParams,Navigate } from "react-router-dom";
+import {useEffect, useState} from "react";
+import api from "../services/api";
 import { motion } from "framer-motion";
+// import { Brain, Zap } from "lucide-react";
 import {
   AlertTriangle,
   CheckCircle,
@@ -14,25 +17,67 @@ const fadeUp = {
 
 export default function Result() {
   // const { state } = useLocation();
+  const [assessment, setAssessment] = useState(null);
  
   const { id } = useParams();
 
-  const assessments =
-    JSON.parse(localStorage.getItem("connect_to_care_assessments")) || [];
+  console.log("Result page ID param:", id);
+  
 
-  const assessment = assessments.find(
-    (item) => String(item.id) === String(id)
-  );
-  console.log("Found assessment:", assessment);
-  if (!assessment) {
-    return <Navigate to="/dashboard" />;
+  // const assessments =
+  //   JSON.parse(localStorage.getItem("connect_to_care_assessments")) || [];
+
+  // const assessment = assessments.find(
+  //   (item) => String(item.id) === String(id)
+  // );
+const loadAssessment = async () => {
+  try {
+    const response = await api.get(
+      `/assessments/${id}`
+    );
+
+    console.log("Assessment:", response.data);
+
+    setAssessment(response.data);
+  } catch (err) {
+    console.error("result error", err);
   }
+};
 
-  const {
-    finalScore = assessment.details.finalScore ?? 0,
-    risk = assessment.result ?? "Low",
-    domainPercentages = assessment.details?.domainPercentages || {},
-  } = assessment;
+useEffect(() => {
+  loadAssessment();
+}, [id]);
+
+if (!assessment) {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      Loading...
+    </div>
+  );
+}
+
+const {
+  finalScore = assessment.details?.finalScore ?? 0,
+  risk = assessment.result ?? "Low",
+  type = assessment.type ?? "autism",
+  domainPercentages =
+    assessment.details?.domainPercentages || {},
+} = assessment;
+
+
+  // console.log("Found assessment:", assessment);
+  // if (!assessment) {
+  //   return <Navigate to="/dashboard" />;
+  // }
+
+  
+
+  // const {
+  //   finalScore = assessment.details.finalScore ?? 0,
+  //   risk = assessment.result ?? "Low",
+  //   type = assessment.type ?? "autism",
+  //   domainPercentages = assessment.details?.domainPercentages || {},
+  // } = assessment;
 
   
 
@@ -45,7 +90,7 @@ export default function Result() {
   const riskConfig = {
     Low: {
       icon: CheckCircle,
-      badge: "bg-emerald-100 text-emerald-700",
+      badge: " text-emerald-700",
       bg: "bg-emerald-50",
       border: "border-emerald-300",
       title: "Low likelihood indicators",
@@ -54,7 +99,7 @@ export default function Result() {
     },
     Moderate: {
       icon: Info,
-      badge: "bg-amber-100 text-amber-700",
+      badge: "text-amber-700",
       bg: "bg-amber-50",
       border: "border-amber-300",
       title: "Moderate likelihood indicators",
@@ -63,7 +108,7 @@ export default function Result() {
     },
     High: {
       icon: AlertTriangle,
-      badge: "bg-rose-100 text-rose-700",
+      badge: " text-rose-700",
       bg: "bg-rose-50",
       border: "border-rose-300",
       title: "Higher likelihood indicators",
@@ -74,6 +119,7 @@ export default function Result() {
 
   const config = riskConfig[risk];
   const Icon = config.icon;
+  
 
   return (
     <main className="min-h-screen bg-gray-50 px-4 py-12">
@@ -89,11 +135,11 @@ export default function Result() {
           <div
             className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full ${config.bg}`}
           >
-            <Icon className="h-8 w-8 text-red-500" />
+            <Icon className={`h-8 w-8 ${config.badge} `} />
           </div>
 
           <h1 className="text-3xl font-semibold text-gray-900">
-            Screening Result
+           {type === "autism" ? "Autism" : "ADHD"} Screening Result
           </h1>
           <p className="mt-2 text-gray-600">
             AI-assisted early screening summary
@@ -109,9 +155,11 @@ export default function Result() {
               <p className="text-sm text-gray-600">
                 Overall Screening Score
               </p>
-              <p className="text-4xl font-bold text-gray-900 mt-1">
+              {type==="autism"?<p className="text-4xl font-bold text-gray-900 mt-1">
+                {finalScore}/20
+              </p>:<p className="text-4xl font-bold text-gray-900 mt-1">
                 {finalScore}%
-              </p>
+              </p>}
               <span
                 className={`inline-block mt-2 px-3 py-1 rounded-full text-sm font-medium ${config.badge}`}
               >
@@ -180,7 +228,7 @@ export default function Result() {
           )}
 
           <Link
-            to={risk === "High" ? "/modules/autism" : "/modules/general"}
+            to={`/care-guidance/${type}`}
             className="flex items-center justify-between rounded-lg border px-5 py-4 hover:bg-gray-50 transition"
           >
             <span className="font-medium text-gray-800">
