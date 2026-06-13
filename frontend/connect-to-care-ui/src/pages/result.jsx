@@ -1,4 +1,4 @@
-import {  Link, useParams,Navigate } from "react-router-dom";
+import {  Link, useParams } from "react-router-dom";
 import {useEffect, useState} from "react";
 import api from "../services/api";
 import { motion } from "framer-motion";
@@ -30,21 +30,23 @@ export default function Result() {
   // const assessment = assessments.find(
   //   (item) => String(item.id) === String(id)
   // );
-const loadAssessment = async () => {
-  try {
-    const response = await api.get(
-      `/assessments/${id}`
-    );
 
-    console.log("Assessment:", response.data);
-
-    setAssessment(response.data);
-  } catch (err) {
-    console.error("result error", err);
-  }
-};
 
 useEffect(() => {
+    const loadAssessment = async () => {
+    try {
+      const response = await api.get(
+        `/assessments/${id}`
+      );
+
+      console.log("Assessment:", response.data);
+
+      setAssessment(response.data);
+    } catch (err) {
+      console.error("result error", err);
+    }
+  };
+
   loadAssessment();
 }, [id]);
 

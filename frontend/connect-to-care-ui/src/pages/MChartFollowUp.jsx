@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, AlertCircle, CheckCircle } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import mchatFollowUpItems from "../data/autismFollowups";
 import api from "../services/api";
-
+/* eslint-disable no-loop-func */
 // M-CHAT-R/F™ © 2009 Diana Robins, Deborah Fein & Marianne Barton
 //
 // Only the items the child scored elevated on (from stage 1) are administered.
@@ -12,9 +12,9 @@ import api from "../services/api";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function getItemData(id) {
-  return mchatFollowUpItems.find((item) => item.id === id);
-}
+// function getItemData(id) {
+//   return mchatFollowUpItems.find((item) => item.id === id);
+// }
 
 // Walk the flowchart for one item given recorded answers { stepId: optionValue }
 // Returns "SCORE_0" | "SCORE_1" | null (incomplete)
