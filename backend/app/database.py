@@ -14,3 +14,5 @@ else:
     print("Successfully connected to the database.")
 
 assessment_collection = db["assessments"]
+
+users_collection = db["users"]

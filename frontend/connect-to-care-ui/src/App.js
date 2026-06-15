@@ -14,17 +14,21 @@ import Dashboard from './pages/Dashboard';
 import AssessmentSelection from './pages/AssessmentSelection';
 import CareGuidance from './pages/CareGuidance';
 import MChatFollowUp from './pages/MChartFollowUp';
+import Register from "./pages/Register";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Profile from './pages/Profile';
 
 
 function App() {
   const location = useLocation();
-  const hideNavbar = location.pathname === '/login';
+  const hideNavbar = location.pathname === '/login' || location.pathname === '/register';
   return (
     <div className="App">
       {!hideNavbar && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login/>} />
+        <Route path="/register" element={<Register/>} />
         {/* <Route path="/detection" element={<Detection/>} /> */}
         <Route path="/detection/detailed" element={<DetailedAssessment/>} />
         <Route path= "/result/:id" element= {<Result/>} />
@@ -32,11 +36,12 @@ function App() {
         <Route path="/autism" element={<Autism/>} />
         <Route path="about" element={<About/>} />
         <Route path="detailed-result" element={<AIresult/>} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/assessments" element={<AssessmentSelection />} />
        <Route path="/assessment/mchat-followup" element={<MChatFollowUp />} />
         <Route path="/assessment/:type" element={<Detection />}/>
         <Route path="/care-guidance/:type" element={<CareGuidance />}/>
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       </Routes>
       <Footer />
     </div>

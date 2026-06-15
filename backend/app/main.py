@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from app.ai.openai_eval import analyze_text
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes.assessment import router
+from app.routes.auth import router as auth_router
 
 app = FastAPI()
 
@@ -18,6 +19,7 @@ app.add_middleware(
 )
 
 app.include_router(router)
+app.include_router(auth_router)
 
 class AssessmentRequest(BaseModel):
     text: str
@@ -25,3 +27,7 @@ class AssessmentRequest(BaseModel):
 @app.post("/api/analyze")
 def analyze_assessment(req: AssessmentRequest):
     return analyze_text(req.text)
+
+
+
+

@@ -1,11 +1,54 @@
 import { Link } from "react-router-dom";
 import { Brain, ArrowRight, ArrowLeft } from "lucide-react";
 import {motion} from "framer-motion";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 export default function Login() {
+const [email, setEmail] = useState("");
+const [password, setPassword] = useState("");
+const [loading, setLoading] = useState(false);
+
+const navigate = useNavigate();
+
+
+const handleLogin = async () => {
+  try {
+    setLoading(true);
+
+    const response = await api.post("/auth/login", {
+      email,
+      password,
+    });
+
+    localStorage.setItem(
+      "token",
+      response.data.token
+    );
+
+    localStorage.setItem(
+      "user",
+      JSON.stringify(response.data.user)
+    );
+
+    navigate("/dashboard");
+
+  } catch (err) {
+    alert(
+      err.response?.data?.detail ||
+      "Login failed"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <motion.div initial = {{ opacity: 0, y: 0 }} animate = {{ opacity: 1, y: 0 }} className="w-full max-w-md bg-white rounded-2xl shadow-lg p-6 sm:p-8">
+    <div className=" min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <motion.div initial = {{ opacity: 0, y: 0 }} animate = {{ opacity: 1, y: 0 }} className=" w-full max-w-md bg-white rounded-2xl shadow-lg p-6 sm:p-8">
 
      <Link
           to="/"
@@ -42,8 +85,10 @@ export default function Login() {
             <input
               type="email"
               placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            />
+              />
           </div>
 
           <div>
@@ -53,15 +98,19 @@ export default function Login() {
             <input
               type="password"
               placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
 
           <button
             type="button"
-            className="w-full rounded-lg bg-emerald-600 px-4 py-3 text-white font-medium hover:bg-emerald-700 transition"
+            onClick={handleLogin}
+            disabled={loading}
+            className="w-full rounded-lg bg-emerald-600 px-4 py-3 text-white font-medium hover:bg-emerald-700 transition disabled:opacity-50"
           >
-            Sign In
+            {loading ? "Signing In..." : "Sign In"}
           </button>
         </form>
 
@@ -84,9 +133,12 @@ export default function Login() {
         {/* Footer Links */}
         <div className="mt-6 text-center text-sm text-gray-500">
           Don’t have an account?{" "}
-          <span className="text-emerald-600 cursor-not-allowed">
-            Register an account
-          </span>
+          <Link
+          to="/register"
+          className="text-emerald-600 hover:underline"
+        >
+          Register an account
+        </Link>
         </div>
 
         {/* Disclaimer */}

@@ -70,7 +70,7 @@ export default function Dashboard() {
           </div>
 
           <Link
-            to="/detection"
+            to="/assessments"
             className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-3 text-white text-sm font-medium hover:bg-emerald-700 transition"
           >
             <PlusCircle className="h-4 w-4" />

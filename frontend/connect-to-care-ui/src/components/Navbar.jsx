@@ -1,10 +1,49 @@
 import  { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import { Brain } from "lucide-react";
 import {motion,AnimatePresence} from "framer-motion";
+import {  useRef, useEffect } from "react";
+
+
+
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+ 
+  const user = JSON.parse(localStorage.getItem("user"));
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    navigate("/login");
+};
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target)
+    ) {
+      setOpen(false);
+    }
+  };
+
+  document.addEventListener(
+    "mousedown",
+    handleClickOutside
+  );
+
+  return () => {
+    document.removeEventListener(
+      "mousedown",
+      handleClickOutside
+    );
+  };
+}, []);
 
   return (
     <header className="border-b relative ">
@@ -34,21 +73,68 @@ export default function Navbar() {
 
         {/* Desktop Action */}
         <div className="hidden md:flex">
-          <Link to="/login">
-          <button className="
-          rounded-lg
-          border border-emerald-600
-          px-4 py-2
-          text-sm font-medium
-          text-emerald-700
-          transition
-          hover:bg-emerald-50
-          hover:text-emerald-800
-          focus:outline-none focus:ring-2 focus:ring-emerald-500
-        ">
-          Log in
+          {user ? (
+  <div className="relative"ref={dropdownRef}>
+    <button
+      onClick={() => setOpen(!open)}
+      className="h-10 w-10 rounded-full bg-emerald-600 text-white font-semibold flex items-center justify-center hover:bg-emerald-700 transition"
+    >
+      {user.name?.charAt(0).toUpperCase()}
+    </button>
+
+    {open && (
+      <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border z-50">
+        
+        {/* User Info */}
+        <div className="p-4 border-b">
+          <p className="font-semibold text-gray-900">
+            {user.name}
+          </p>
+          <p className="text-sm text-gray-500">
+            {user.email}
+          </p>
+        </div>
+
+        {/* Menu */}
+        <div className="py-2">
+          <Link
+            to="/profile"
+            className="block px-4 py-2 text-sm hover:bg-gray-50"
+            onClick={() => setOpen(false)}
+          >
+            Profile
+          </Link>
+
+          <Link
+            to="/dashboard"
+            className="block px-4 py-2 text-sm hover:bg-gray-50"
+            onClick={() => setOpen(false)}
+          >
+            Dashboard
+          </Link>
+
+          <button
+            onClick={() => {
+              handleLogout();
+              setOpen(false);
+            }}
+            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+            // onClick={() => setOpen(false)}
+          >
+            Logout
           </button>
-        </Link>
+        </div>
+      </div>
+    )}
+  </div>
+) : (
+  <Link
+    to="/login"
+    className="rounded-lg border border-emerald-600 px-4 py-2 text-sm font-medium text-emerald-600 hover:bg-emerald-50"
+  >
+    Login
+  </Link>
+)}
       </div>
 
 
