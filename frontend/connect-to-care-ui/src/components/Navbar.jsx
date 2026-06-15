@@ -163,11 +163,52 @@ useEffect(() => {
           <Link to="/about" onClick={() => setMobileMenuOpen(false)}>
             About Us
           </Link>
-          <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
-          <button className="border px-4 py-2 rounded w-full ">
-            Log in
-          </button>
-          </Link>
+         {user ? (
+  <>
+    <div className="flex items-center gap-3 border-t pt-4">
+      <div className="h-10 w-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-semibold">
+        {user.name?.charAt(0).toUpperCase()}
+      </div>
+
+      <div>
+        <p className="font-medium text-sm">{user.name}</p>
+        <p className="text-xs text-gray-500">{user.email}</p>
+      </div>
+    </div>
+
+    <Link
+      to="/profile"
+      onClick={() => setMobileMenuOpen(false)}
+      className="font-medium"
+    >
+      Profile
+    </Link>
+
+    <Link
+      to="/dashboard"
+      onClick={() => setMobileMenuOpen(false)}
+      className="font-medium"
+    >
+      Dashboard
+    </Link>
+
+    <button
+      onClick={() => {
+        handleLogout();
+        setMobileMenuOpen(false);
+      }}
+      className="border border-red-500 text-red-600 px-4 py-2 rounded w-full"
+    >
+      Logout
+    </button>
+  </>
+) : (
+  <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+    <button className="border px-4 py-2 rounded w-full">
+      Log in
+    </button>
+  </Link>
+)}
         </motion.nav>
       )}
       </AnimatePresence>
