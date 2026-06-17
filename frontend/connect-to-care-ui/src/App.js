@@ -17,6 +17,10 @@ import MChatFollowUp from './pages/MChartFollowUp';
 import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Profile from './pages/Profile';
+import EmotionMatchingGame from './pages/EmotionMatchingGame';
+import SocialStoryPractice from './pages/SocialStoryPractice';
+import FocusTimer from './pages/FocusTimer';
+import TaskBreakdownExercise from './pages/TaskBreakdownExc';
 
 
 function App() {
@@ -41,7 +45,11 @@ function App() {
        <Route path="/assessment/mchat-followup" element={<MChatFollowUp />} />
         <Route path="/assessment/:type" element={<Detection />}/>
         <Route path="/care-guidance/:type" element={<CareGuidance />}/>
+        <Route path="/autism/social-story" element={<SocialStoryPractice />} />
+        <Route path="/autism/emotion-matching" element={<EmotionMatchingGame />} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/adhd/focus-timer" element={<FocusTimer />} />
+        <Route path="/adhd/task-breakdown" element={<TaskBreakdownExercise />} />
       </Routes>
       <Footer />
     </div>
