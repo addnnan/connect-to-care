@@ -154,6 +154,12 @@ export default function Assessment() {
       return;
     }
 
+    const answeredQuestions = questions.map((q) => ({
+      id: q.id,
+      question: q.text,
+      answer: answers[q.id],
+    }));
+
     const assessmentRecord = {
       id: Date.now(),
       type,
@@ -161,6 +167,8 @@ export default function Assessment() {
       result: result.risk,
       score: result.finalScore,
       details: result,
+      answers,
+      answeredQuestions,
     };
 
     const response = await api.post(

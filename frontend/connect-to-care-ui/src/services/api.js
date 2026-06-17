@@ -16,4 +16,10 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+export const downloadReport = async (assessmentId) => {
+  return api.get(`/reports/${assessmentId}`, {
+    responseType: "blob",
+  });
+};
+
 export default api;

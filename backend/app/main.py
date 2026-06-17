@@ -4,6 +4,9 @@ from app.ai.openai_eval import analyze_text
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes.assessment import router
 from app.routes.auth import router as auth_router
+from app.routes import report
+
+
 
 app = FastAPI()
 
@@ -20,6 +23,7 @@ app.add_middleware(
 
 app.include_router(router)
 app.include_router(auth_router)
+app.include_router(report.router)
 
 class AssessmentRequest(BaseModel):
     text: str

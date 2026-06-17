@@ -6,3 +6,5 @@ class Assessment(BaseModel):
     score: int | None = None
     date: str
     details: dict
+    answers: dict = {}
+    answeredQuestions: list = []
