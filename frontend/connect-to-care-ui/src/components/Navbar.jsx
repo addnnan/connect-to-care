@@ -77,7 +77,7 @@ useEffect(() => {
   <div className="relative"ref={dropdownRef}>
     <button
       onClick={() => setOpen(!open)}
-      className="h-10 w-10 rounded-full bg-emerald-600 text-white font-semibold flex items-center justify-center hover:bg-emerald-700 transition"
+      className="h-10 w-10 rounded-full bg-emerald-600 text-white font-medium text-lg flex items-center justify-center hover:bg-emerald-700 transition"
     >
       {user.name?.charAt(0).toUpperCase()}
     </button>

@@ -36,9 +36,9 @@ export default function Home() {
                     </button>
                   </Link>
 
-                  <Link to="/therapy-modules" className="w-full sm:w-auto">
+                  <Link to="/detection/detailed" className="w-full sm:w-auto">
                     <button className="w-full flex items-center justify-center gap-2 rounded-lg border border-emerald-600 bg-white px-6 py-3 text-base font-medium text-emerald-700 transition hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                      Explore Modules
+                      Behavioral Test
                       <ArrowRight className="h-5 w-5" />
                     </button>
                   </Link>
