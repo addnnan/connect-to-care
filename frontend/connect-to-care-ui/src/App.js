@@ -34,16 +34,16 @@ function App() {
         <Route path="/login" element={<Login/>} />
         <Route path="/register" element={<Register/>} />
         {/* <Route path="/detection" element={<Detection/>} /> */}
-        <Route path="/detection/detailed" element={<DetailedAssessment/>} />
-        <Route path= "/result/:id" element= {<Result/>} />
+        <Route path="/detection/detailed" element={<ProtectedRoute><DetailedAssessment/></ProtectedRoute>} />
+        <Route path= "/result/:id" element= {<ProtectedRoute><Result/></ProtectedRoute>} />
         <Route path="/ADHD" element={<ADHD/>} />
         <Route path="/autism" element={<Autism/>} />
         <Route path="about" element={<About/>} />
         <Route path="detailed-result" element={<AIresult/>} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/assessments" element={<AssessmentSelection />} />
-       <Route path="/assessment/mchat-followup" element={<MChatFollowUp />} />
-        <Route path="/assessment/:type" element={<Detection />}/>
+        <Route path="/assessments" element={<ProtectedRoute><AssessmentSelection /></ProtectedRoute>} />
+       <Route path="/assessment/mchat-followup" element={<ProtectedRoute><MChatFollowUp /></ProtectedRoute>} />
+        <Route path="/assessment/:type" element={<ProtectedRoute><Detection /></ProtectedRoute>}/>
         <Route path="/care-guidance/:type" element={<CareGuidance />}/>
         <Route path="/autism/social-story" element={<SocialStoryPractice />} />
         <Route path="/autism/emotion-matching" element={<EmotionMatchingGame />} />

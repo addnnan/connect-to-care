@@ -1,5 +1,9 @@
 fastapi
 uvicorn
-openai
+google-generativeai
 python-dotenv
 pydantic
+pymongo
+python-jose[cryptography]
+passlib[bcrypt]
+reportlab
