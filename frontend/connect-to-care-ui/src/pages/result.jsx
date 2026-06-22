@@ -3,10 +3,37 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import { motion } from "framer-motion";
 import { Download, AlertTriangle, CheckCircle, Info, ArrowRight } from "lucide-react";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, Cell } from "recharts";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
+};
+
+const CustomTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    const isCritical = data.weight >= 0.1;
+    return (
+      <div className={`p-4 rounded-2xl border shadow-xl max-w-sm bg-white ${
+        isCritical ? "border-amber-200 bg-amber-50/95" : "border-gray-200 bg-white/95"
+      }`}>
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          Question {data.num} ({data.domain})
+        </p>
+        <p className="text-sm font-semibold text-gray-900 mt-1 leading-relaxed">
+          {data.question}
+        </p>
+        <div className="mt-3 flex justify-between items-center border-t border-gray-200/50 pt-2">
+          <span className="text-xs text-gray-500 font-medium">Clinical Severity Weight</span>
+          <span className={`text-sm font-bold ${isCritical ? "text-amber-700" : "text-gray-700"}`}>
+            {data.weight.toFixed(2)}
+          </span>
+        </div>
+      </div>
+    );
+  }
+  return null;
 };
 
 export default function Result() {
@@ -14,20 +41,21 @@ export default function Result() {
   const [downloading, setDownloading] = useState(false);
   const { id } = useParams();
 
-  const handleDownloadReport = async () => {
+  const handlePayAndDownload = async () => {
     setDownloading(true);
     try {
-      const response = await api.get(`/reports/${id}`, { responseType: "blob" });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `assessment-report-${id}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      const response = await api.post("/create-checkout-session", {
+        assessment_id: id,
+      });
+      const { checkout_url } = response.data;
+      if (checkout_url) {
+        window.location.href = checkout_url;
+      } else {
+        alert("Failed to initiate payment session. Please try again.");
+      }
     } catch (err) {
-      console.error("PDF download failed", err);
+      console.error("Stripe Checkout failed", err);
+      alert("Error initiating payment checkout.");
     } finally {
       setDownloading(false);
     }
@@ -59,6 +87,14 @@ export default function Result() {
     type = assessment.type ?? "autism",
     domainPercentages = assessment.details?.domainPercentages || {},
   } = assessment;
+
+  const chartData = (assessment.details?.sortedFailedQuestions || []).map((item) => ({
+    name: `Q${item.num}`,
+    weight: item.weight,
+    question: item.question,
+    domain: item.domain,
+    num: item.num,
+  }));
 
   const riskConfig = {
     Low: {
@@ -161,12 +197,77 @@ export default function Result() {
           </section>
         )}
 
+        {/* Critical Indicators (ML Severity Sorted Chart) */}
+        {assessment.details?.sortedFailedQuestions?.length > 0 && (
+          <section className="mb-12">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              Critical Behavioral Indicators (ML Priority Chart)
+            </h3>
+            <p className="text-sm text-gray-600 mb-6">
+              The following chart displays the child's flagged responses sorted by their clinical significance (weight). Hover over each bar to review full behavioral details and domain categories.
+            </p>
+            <div className="w-full bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
+              <div className="h-80 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={chartData}
+                    layout="vertical"
+                    margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
+                  >
+                    <XAxis
+                      type="number"
+                      domain={[0, 0.3]}
+                      tickFormatter={(val) => val.toFixed(2)}
+                      stroke="#9ca3af"
+                      fontSize={11}
+                    />
+                    <YAxis
+                      dataKey="name"
+                      type="category"
+                      width={40}
+                      stroke="#9ca3af"
+                      fontSize={11}
+                      tickLine={false}
+                    />
+                    <RechartsTooltip
+                      content={<CustomTooltip />}
+                      cursor={{ fill: "rgba(0, 0, 0, 0.02)" }}
+                    />
+                    <Bar dataKey="weight" radius={[0, 4, 4, 0]} barSize={16}>
+                      {chartData.map((entry, index) => {
+                        const isCritical = entry.weight >= 0.1;
+                        return (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={isCritical ? "#d97706" : "#10b981"} // Amber-600 vs Emerald-500
+                          />
+                        );
+                      })}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-4 items-center justify-center text-xs border-t border-gray-100 pt-4">
+                <span className="flex items-center gap-1.5 font-medium text-gray-600">
+                  <span className="w-3 h-3 rounded bg-[#d97706] inline-block" />
+                  Critical Predictor (&ge; 0.10)
+                </span>
+                <span className="flex items-center gap-1.5 font-medium text-gray-600">
+                  <span className="w-3 h-3 rounded bg-[#10b981] inline-block" />
+                  Baseline Predictor (&lt; 0.10)
+                </span>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Next Actions */}
         <section className="space-y-3">
 
           {/* Download PDF — first and most prominent */}
           <button
-            onClick={handleDownloadReport}
+            onClick={handlePayAndDownload}
             disabled={downloading}
             className="flex items-center justify-between w-full rounded-lg border border-emerald-200 bg-emerald-50 px-5 py-4 hover:bg-emerald-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -174,10 +275,10 @@ export default function Result() {
               <Download className="h-4 w-4 text-emerald-600 flex-shrink-0" />
               <div className="text-left">
                 <p className="font-medium text-emerald-800 text-sm">
-                  {downloading ? "Generating report…" : "Download PDF report"}
+                  {downloading ? "Initiating Checkout…" : "Pay & Download Official Report ($5.00)"}
                 </p>
                 <p className="text-xs text-emerald-600 mt-0.5">
-                  Full summary with domain breakdown and recommendations
+                  Get your official PDF clinical report with ML severity analysis
                 </p>
               </div>
             </div>

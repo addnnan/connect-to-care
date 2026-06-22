@@ -21,6 +21,7 @@ import EmotionMatchingGame from './pages/EmotionMatchingGame';
 import SocialStoryPractice from './pages/SocialStoryPractice';
 import FocusTimer from './pages/FocusTimer';
 import TaskBreakdownExercise from './pages/TaskBreakdownExc';
+import PaymentSuccess from './pages/PaymentSuccess';
 
 
 function App() {
@@ -50,6 +51,7 @@ function App() {
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/adhd/focus-timer" element={<FocusTimer />} />
         <Route path="/adhd/task-breakdown" element={<TaskBreakdownExercise />} />
+        <Route path="/success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
       </Routes>
       <Footer />
     </div>
