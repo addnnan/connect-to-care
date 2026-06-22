@@ -157,7 +157,7 @@ useEffect(() => {
           <Link to="/adhd" onClick={() => setMobileMenuOpen(false)}>
             ADHD
           </Link>
-          <Link to="/detection" onClick={() => setMobileMenuOpen(false)}>
+          <Link to="/assessments" onClick={() => setMobileMenuOpen(false)}>
             Detection Test
           </Link>
           <Link to="/about" onClick={() => setMobileMenuOpen(false)}>

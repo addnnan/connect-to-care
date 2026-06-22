@@ -42,7 +42,7 @@ function App() {
         <Route path="detailed-result" element={<AIresult/>} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/assessments" element={<AssessmentSelection />} />
-       <Route path="/assessment/mchat-followup" element={<MChatFollowUp />} />
+        <Route path="/assessment/mchat-followup" element={<MChatFollowUp />} />
         <Route path="/assessment/:type" element={<Detection />}/>
         <Route path="/care-guidance/:type" element={<CareGuidance />}/>
         <Route path="/autism/social-story" element={<SocialStoryPractice />} />
