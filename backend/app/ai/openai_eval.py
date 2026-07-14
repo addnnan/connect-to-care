@@ -9,76 +9,80 @@ load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 
-# Initialize the model (Gemini 1.5 Flash is fast and cost-effective)
+# Initialize the model (Gemini 2.5 Flash is fast, smart, and cost-effective)
 model = genai.GenerativeModel("gemini-2.5-flash")
 
 def analyze_text(text: str):
-    # Constructing a prompt to force a specific output format
     prompt = f"""
-    You are an expert clinical assistant specializing in early detection of Autism Spectrum Disorder (ASD) and ADHD
+    You are an advanced clinical language processing assistant specializing in neurodevelopmental screening.
 
     Task:
-    Evaluate the text ONLY for early behavioral indicators related to:
-    - social interaction
-    - communication
-    - attention regulation
-    - repetitive behaviors
-    - sensory sensitivity
+    Analyze the text provided by a caregiver/observer to map early indicators against established DSM-5 behavioral criteria for Autism Spectrum Disorder (ASD) and ADHD.
 
     Instructions:
-    1. Do NOT diagnose.
-    2. Do NOT add explanations outside JSON.
-    3. Use ONLY the categories: Low, Moderate, High.
-    4. Confidence must reflect strength of indicators in the text.
-
-    Scoring rubric:
-    - Low: vague, occasional, or no indicators
-    - Moderate: multiple mild indicators OR one strong indicator
-    - High: multiple strong indicators across categories
+    1. Do NOT make a formal medical diagnosis. Frame everything as "observed indicators" and "screening likelihood".
+    2. Explicitly determine if the observed behaviors point toward ASD indicators, ADHD indicators, Combined patterns, or Low indicators across both.
+    3. Evaluate ASD traits across two domains: Social Communication/Interaction and Restricted/Repetitive Behaviors.
+    4. Evaluate ADHD traits across two domains: Inattention and Hyperactivity/Impulsivity.
 
     Return STRICT JSON in this exact format:
     {{
-    "label": "Low | Moderate | High",
-    "confidence_score": number between 0.0 and 1.0
-    "analysis": string (detailed explanation of findings based on the text and questionnaire)
-    "recommendations": string[] (list of recommended next steps)
+      "primary_indication": "Autism Spectrum Disorder | ADHD | Combined Patterns | Low Indicators",
+      "likelihood": "Low | Moderate | High",
+      "confidence": 0.85,
+      "analysis": "A concise, objective summary explaining which indicators appeared in the text and how they relate to the flagged conditions.",
+      "domain_flags": {{
+        "asd_social_communication": true,
+        "asd_repetitive_behaviors": false,
+        "adhd_inattention": true,
+        "adhd_hyperactivity_impulsivity": false
+      }},
+      "specific_observations": [
+        "e.g., Avoids eye contact when name is called", 
+        "e.g., Struggles to remain seated during meals"
+      ],
+      "recommendations": [
+        "First specific diagnostic next step",
+        "Second tailored everyday support strategy"
+      ]
     }}
 
     Text to analyze:
     \"\"\"{text}\"\"\"
     """
 
-
     try:
-        # Generate content
         response = model.generate_content(
             prompt,
             generation_config={"response_mime_type": "application/json"}
         )
         
-        # Parse the JSON response
+        # Safely parse data
         data = json.loads(response.text)
-        likelihood = data.get("label", "Moderate")
-        confidence = int(data.get("confidence_score", 0.5) * 100)
-        ai_analysis = data.get("analysis", "Behavioral patterns were reviewed.")
-        recommendations = data.get("recommendations", [])
-
+        
         return {
-            "likelihood": likelihood,
-            "confidence": confidence,
-            "analysis": ai_analysis,
-            "recommendations": recommendations
+            "primary_indication": data.get("primary_indication", "Low Indicators"),
+            "likelihood": data.get("likelihood", "Moderate"),
+            "confidence": int(data.get("confidence_score", data.get("confidence", 0.5)) * 100),
+            "analysis": data.get("analysis", "Behavioral logs reviewed by automated screening."),
+            "domain_flags": data.get("domain_flags", {
+                "asd_social_communication": False,
+                "asd_repetitive_behaviors": False,
+                "adhd_inattention": False,
+                "adhd_hyperactivity_impulsivity": False
+            }),
+            "specific_observations": data.get("specific_observations", []),
+            "recommendations": data.get("recommendations", ["Consult a healthcare professional for an objective observation."])
         }
 
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error during backend text analysis: {e}")
         return {
-            "likelihood": "Moderate",
+            "primary_indication": "Low Indicators",
+            "likelihood": "Low",
             "confidence": 50,
-            "analysis": "AI service temporarily unavailable. Showing neutral screening result.",
-            "recommendations": [
-                "Please try again later.",
-                "Consult a healthcare professional."
-            ]
+            "analysis": "AI screening service temporarily unavailable. No definitive traits could be parsed.",
+            "domain_flags": {"asd_social_communication": False, "asd_repetitive_behaviors": False, "adhd_inattention": False, "adhd_hyperactivity_impulsivity": False},
+            "specific_observations": [],
+            "recommendations": ["Please resubmit your observations later.", "Consult with your local pediatric center."]
         }
-

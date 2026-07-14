@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import api from "../services/api";
 
 const assessmentSchema = z.object({
   title: z.string().min(3, "Title is required"),
@@ -26,33 +27,39 @@ export default function DetailedAssessment() {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
+      
+      // 1. Get the newly structured AI analysis from your Python backend
       const res = await fetch("http://127.0.0.1:8000/api/analyze", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          text: data.notes,
-        }),
+        body: JSON.stringify({ text: data.notes }),
       });
 
-      console.log("STATUS:", res.status);
+      if (!res.ok) throw new Error(`Backend error ${res.status}`);
+      const aiResult = await res.json();
 
-      const rawText = await res.text();
-      console.log("RAW RESPONSE:", rawText);
+      // 2. Wrap it in your system's standard assessment log format
+      const assessmentRecord = {
+        type: "detailed-ai", // Unique type identifier for history tracking
+        date: new Date().toISOString(),
+        result: aiResult.likelihood, 
+        score: aiResult.confidence, // Successfully tracks the corrected integer confidence percentage
+        details: aiResult, // Keeps the entire structure (domain_flags, observations, etc.)
+      };
 
-      if (!res.ok) {
-        throw new Error(`Backend error ${res.status}`);
-      }
+      // 3. Save the full record to your database route
+      const saveResponse = await api.post("/assessments", assessmentRecord);
 
-      const result = JSON.parse(rawText);
-
+      // 4. Navigate to the results page passing the clean nested object layout
       navigate("/detailed-result", {
-        state: result,
+        state: saveResponse.data
       });
+      
     } catch (err) {
       console.error("ERROR:", err);
-      alert("Something went wrong while analyzing the assessment.");
+      alert("Something went wrong while analyzing and saving the assessment.");
       setLoading(false);
     }
   };

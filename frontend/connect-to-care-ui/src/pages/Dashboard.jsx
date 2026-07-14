@@ -87,33 +87,43 @@ export default function Dashboard() {
             </p>
           ) : (
             <ul className="divide-y divide-gray-100 dark:divide-slate-800">
-              {assessments.map((item) => (
-                <li
-                  key={item._id}
-                  className="flex items-center justify-between py-4"
-                >
-                  <div>
-                    <p className="text-md font-semibold text-gray-900 dark:text-white">
-                      {item.type === "autism" ? "Autism" : "ADHD"} Assessment
-                    </p>
-                    <p className="text-xs text-gray-600 dark:text-slate-300">
-                      {item.result} likelihood
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-slate-500">
-                      {new Date(item.date).toLocaleString()}
-                    </p>
-                  </div>
+              {assessments.map((item) => {
+                // Determine user-friendly display titles based on the evaluation type
+                const isDetailedAI = item.type === "detailed-ai";
+                let displayTitle = "";
+                
+                if (isDetailedAI) {
+                  displayTitle = `Detailed AI Screen: ${item.details?.primary_indication || "Behavioral Analysis"}`;
+                } else {
+                  displayTitle = `${item.type === "autism" ? "Autism" : "ADHD"} Screening`;
+                }
 
-                  <Link
-                    to={`/result/${item._id}`}
-                    state={item}
-                    className="inline-flex items-center gap-1 text-sm text-emerald-600 hover:underline dark:text-emerald-400"
-                  >
-                    View result
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </li>
-              ))}
+                return (
+                  <li key={item._id} className="flex items-center justify-between py-4">
+                    <div>
+                      <p className="text-md font-semibold text-gray-900 dark:text-white">
+                        {displayTitle}
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-slate-300">
+                        {item.result} Likelihood {isDetailedAI && `(Confidence: ${item.score}%)`}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-slate-500">
+                        {new Date(item.date).toLocaleString()}
+                      </p>
+                    </div>
+
+                    {/* Dynamic routing parameter choice */}
+                    <Link
+                      to={isDetailedAI ? "/detailed-result" : `/result/${item._id}`}
+                      state={isDetailedAI ? item.details : item}
+                      className="inline-flex items-center gap-1 text-sm text-emerald-600 hover:underline dark:text-emerald-400"
+                    >
+                      View result
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </motion.div>
