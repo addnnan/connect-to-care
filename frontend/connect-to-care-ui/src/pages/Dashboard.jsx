@@ -105,7 +105,7 @@ export default function Dashboard() {
                         {displayTitle}
                       </p>
                       <p className="text-xs text-gray-600 dark:text-slate-300">
-                        {item.result} Likelihood {isDetailedAI && `(Confidence: ${item.score}%)`}
+                        {item.result} Likelihood 
                       </p>
                       <p className="text-xs text-gray-500 dark:text-slate-500">
                         {new Date(item.date).toLocaleString()}
