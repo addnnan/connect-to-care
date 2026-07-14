@@ -42,32 +42,32 @@ const EXAMPLES = [
 
 export default function TaskBreakdownExercise() {
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-10 print:bg-white">
+    <div className="min-h-screen bg-gray-50 px-4 py-10 transition-colors duration-300 dark:bg-slate-950 print:bg-white">
       <div className="max-w-2xl mx-auto">
 
         <div className="flex items-center justify-between mb-6 print:hidden">
           <Link
             to="/adhd"
-            className="flex items-center gap-1 text-sm text-gray-600 hover:text-indigo-600 transition"
+            className="flex items-center gap-1 text-sm text-gray-600 hover:text-indigo-600 transition dark:text-slate-400 dark:hover:text-indigo-400"
           >
             <ArrowLeft className="h-4 w-4" /> Back to ADHD Module
           </Link>
           <button
             onClick={() => window.print()}
-            className="flex items-center gap-2 text-sm text-gray-600 hover:text-indigo-600 transition"
+            className="flex items-center gap-2 text-sm text-gray-600 hover:text-indigo-600 transition dark:text-slate-400 dark:hover:text-indigo-400"
           >
             <Printer className="h-4 w-4" /> Print
           </button>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
-          <span className="text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-full px-3 py-1">
+        <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-transparent dark:bg-slate-900 dark:border-slate-800">
+          <span className="text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-full px-3 py-1 dark:bg-indigo-950/40 dark:border-indigo-800 dark:text-indigo-400">
             Task Breakdown Exercise
           </span>
-          <h1 className="text-2xl font-semibold text-gray-900 mt-4 mb-2">
+          <h1 className="text-2xl font-semibold text-gray-900 mt-4 mb-2 dark:text-white">
             Turning overwhelming tasks into small steps
           </h1>
-          <p className="text-sm text-gray-500 mb-8">
+          <p className="text-sm text-gray-500 mb-8 dark:text-slate-400">
             Big, vague tasks trigger avoidance. Breaking them into specific,
             tiny actions makes starting much easier. Use these examples as a
             template for any task.
@@ -75,16 +75,16 @@ export default function TaskBreakdownExercise() {
 
           <div className="space-y-10">
             {EXAMPLES.map((ex, i) => (
-              <div key={ex.title} className="border-t pt-8 first:border-t-0 first:pt-0">
-                <h2 className="text-lg font-semibold text-gray-900 mb-2">
+              <div key={ex.title} className="border-t border-gray-100 pt-8 first:border-t-0 first:pt-0 dark:border-slate-800">
+                <h2 className="text-lg font-semibold text-gray-900 mb-2 dark:text-white">
                   {i + 1}. {ex.title}
                 </h2>
-                <p className="text-sm text-gray-500 italic mb-4">{ex.overwhelm}</p>
+                <p className="text-sm text-gray-500 italic mb-4 dark:text-slate-400">{ex.overwhelm}</p>
 
                 <ol className="space-y-2">
                   {ex.steps.map((step, j) => (
-                    <li key={j} className="flex gap-3 text-sm text-gray-700">
-                      <span className="flex-shrink-0 h-5 w-5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-medium flex items-center justify-center">
+                    <li key={j} className="flex gap-3 text-sm text-gray-700 dark:text-slate-300">
+                      <span className="flex-shrink-0 h-5 w-5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-medium flex items-center justify-center dark:bg-indigo-950 dark:text-indigo-400">
                         {j + 1}
                       </span>
                       {step}
@@ -95,17 +95,17 @@ export default function TaskBreakdownExercise() {
             ))}
           </div>
 
-          <div className="mt-10 bg-indigo-50 border border-indigo-100 rounded-xl p-5">
-            <p className="text-sm font-medium text-indigo-800 mb-2">Your own task:</p>
-            <p className="text-xs text-indigo-600 mb-3">
+          <div className="mt-10 bg-indigo-50 border border-indigo-100 rounded-xl p-5 dark:bg-indigo-950/20 dark:border-indigo-900/40">
+            <p className="text-sm font-medium text-indigo-800 mb-2 dark:text-indigo-300">Your own task:</p>
+            <p className="text-xs text-indigo-600 mb-3 dark:text-indigo-400">
               Pick something you've been avoiding. Write down the very first
               physical action — not the goal, just the first 2-minute step.
             </p>
-            <div className="border-2 border-dashed border-indigo-200 rounded-lg h-20 bg-white" />
+            <div className="border-2 border-dashed border-indigo-200 rounded-lg h-20 bg-white dark:bg-slate-800 dark:border-indigo-900/60" />
           </div>
         </div>
 
-        <p className="mt-6 text-xs text-gray-400 text-center print:hidden">
+        <p className="mt-6 text-xs text-gray-400 text-center dark:text-slate-500 print:hidden">
           This exercise is a self-management tool and does not replace
           individualized executive function coaching or therapy.
         </p>

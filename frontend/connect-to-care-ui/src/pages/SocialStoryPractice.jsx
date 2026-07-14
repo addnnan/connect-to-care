@@ -40,48 +40,48 @@ const STORIES = [
 
 export default function SocialStoryPractice() {
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-10 print:bg-white">
+    <div className="min-h-screen bg-gray-50 px-4 py-10 transition-colors duration-300 dark:bg-slate-950 print:bg-white">
       <div className="max-w-2xl mx-auto">
 
         <div className="flex items-center justify-between mb-6 print:hidden">
           <Link
             to="/autism"
-            className="flex items-center gap-1 text-sm text-gray-600 hover:text-emerald-600 transition"
+            className="flex items-center gap-1 text-sm text-gray-600 hover:text-emerald-600 transition dark:text-slate-400 dark:hover:text-emerald-400"
           >
             <ArrowLeft className="h-4 w-4" /> Back to Autism Module
           </Link>
           <button
             onClick={() => window.print()}
-            className="flex items-center gap-2 text-sm text-gray-600 hover:text-emerald-600 transition"
+            className="flex items-center gap-2 text-sm text-gray-600 hover:text-emerald-600 transition dark:text-slate-400 dark:hover:text-emerald-400"
           >
             <Printer className="h-4 w-4" /> Print
           </button>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
-          <span className="text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1">
+        <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-transparent dark:bg-slate-900 dark:border-slate-800">
+          <span className="text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1 dark:bg-emerald-950/40 dark:border-emerald-800 dark:text-emerald-400">
             Social Story Practice
           </span>
-          <h1 className="text-2xl font-semibold text-gray-900 mt-4 mb-2">
+          <h1 className="text-2xl font-semibold text-gray-900 mt-4 mb-2 dark:text-white">
             Practice stories for everyday situations
           </h1>
-          <p className="text-sm text-gray-500 mb-8">
+          <p className="text-sm text-gray-500 mb-8 dark:text-slate-400">
             Read each story together. Pause to talk about how the child feels
             at each step, and what they could do or say.
           </p>
 
           <div className="space-y-10">
             {STORIES.map((story, i) => (
-              <div key={story.title} className="border-t pt-8 first:border-t-0 first:pt-0">
-                <h2 className="text-lg font-semibold text-gray-900 mb-3">
+              <div key={story.title} className="border-t border-gray-100 pt-8 first:border-t-0 first:pt-0 dark:border-slate-800">
+                <h2 className="text-lg font-semibold text-gray-900 mb-3 dark:text-white">
                   {i + 1}. {story.title}
                 </h2>
-                <p className="text-gray-700 mb-4 leading-relaxed">{story.situation}</p>
+                <p className="text-gray-700 mb-4 leading-relaxed dark:text-slate-300">{story.situation}</p>
 
                 <ol className="space-y-2 mb-4">
                   {story.steps.map((step, j) => (
-                    <li key={j} className="flex gap-3 text-sm text-gray-700">
-                      <span className="flex-shrink-0 h-5 w-5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium flex items-center justify-center">
+                    <li key={j} className="flex gap-3 text-sm text-gray-700 dark:text-slate-300">
+                      <span className="flex-shrink-0 h-5 w-5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium flex items-center justify-center dark:bg-emerald-950 dark:text-emerald-400">
                         {j + 1}
                       </span>
                       {step}
@@ -89,18 +89,18 @@ export default function SocialStoryPractice() {
                   ))}
                 </ol>
 
-                <div className="bg-amber-50 border border-amber-100 rounded-xl p-4">
-                  <p className="text-xs font-medium text-amber-700 uppercase tracking-wide mb-1">
+                <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 dark:bg-amber-950/20 dark:border-amber-900/40">
+                  <p className="text-xs font-medium text-amber-700 uppercase tracking-wide mb-1 dark:text-amber-400">
                     How I might feel
                   </p>
-                  <p className="text-sm text-amber-800">{story.feeling}</p>
+                  <p className="text-sm text-amber-800 dark:text-amber-300">{story.feeling}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <p className="mt-6 text-xs text-gray-400 text-center print:hidden">
+        <p className="mt-6 text-xs text-gray-400 text-center dark:text-slate-500 print:hidden">
           Social stories are a tool to support understanding, not a substitute
           for individualized professional guidance.
         </p>

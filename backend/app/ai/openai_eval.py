@@ -8,10 +8,6 @@ load_dotenv()
 # Configure the Gemini API
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
-print("Available models that support text generation:")
-for m in genai.list_models():
-    if 'generateContent' in m.supported_generation_methods:
-        print(f"- {m.name}")
 
 # Initialize the model (Gemini 1.5 Flash is fast and cost-effective)
 model = genai.GenerativeModel("gemini-2.5-flash")

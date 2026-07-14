@@ -36,32 +36,35 @@ export default function Register() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="relative min-h-screen flex items-center justify-center bg-gray-50 px-4 transition-colors duration-300 dark:bg-slate-950">
       <motion.div
         initial={{ opacity: 0, y: 0 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md bg-white rounded-2xl shadow-lg p-6 sm:p-8"
+        className=" w-full max-w-md bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-transparent dark:bg-slate-900 dark:border-slate-800"
       >
         {/* Back */}
         <Link
           to="/"
-          className="absolute left-4 top-4 flex items-center gap-1 text-sm text-slate-500 hover:text-emerald-600 transition font-semibold hover:border px-2 py-1 rounded-lg"
+          className="absolute left-4 top-4 flex items-center gap-1 text-sm text-slate-500 hover:text-emerald-600 transition font-semibold hover:border px-2 py-1 rounded-lg dark:text-slate-400 dark:hover:text-emerald-400 dark:hover:border-slate-700"
         >
           <ArrowLeft className="h-4 w-4" />
           Home
         </Link>
 
         {/* Logo */}
-        <div className="flex items-center justify-center gap-2 mb-6">
-          <Brain className="h-7 w-7 text-emerald-600" />
+        <div className="flex items-center justify-center gap-2 mb-6 mt-4">
+          <Brain className="h-7 w-7 text-emerald-600 dark:text-emerald-400" />
+          <span className="text-xl font-semibold text-gray-900 dark:text-white">
+            ConnectToCare
+          </span>
         </div>
 
         {/* Heading */}
-        <h2 className="text-2xl font-semibold text-gray-900 text-center mb-2">
+        <h2 className="text-2xl font-semibold text-gray-900 text-center mb-2 dark:text-white">
           Create an account
         </h2>
 
-        <p className="text-sm text-gray-500 text-center mb-6">
+        <p className="text-sm text-gray-500 text-center mb-6 dark:text-slate-400">
           Save assessments and continue care
         </p>
 
@@ -74,7 +77,7 @@ export default function Register() {
           }}
         >
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
               Full Name
             </label>
 
@@ -84,12 +87,12 @@ export default function Register() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full rounded-lg border border-gray-300 bg-white text-gray-900 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-emerald-400"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
               Email address
             </label>
 
@@ -99,12 +102,12 @@ export default function Register() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full rounded-lg border border-gray-300 bg-white text-gray-900 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-emerald-400"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
               Password
             </label>
 
@@ -114,32 +117,32 @@ export default function Register() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full rounded-lg border border-gray-300 bg-white text-gray-900 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-emerald-400"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-emerald-600 px-4 py-3 text-white font-medium hover:bg-emerald-700 transition disabled:opacity-50"
+            className="w-full rounded-lg bg-emerald-600 px-4 py-3 text-white font-medium hover:bg-emerald-700 transition disabled:opacity-50 dark:bg-emerald-600 dark:hover:bg-emerald-500"
           >
             {loading ? "Creating Account..." : "Create Account"}
           </button>
         </form>
 
         {/* Footer */}
-        <div className="mt-6 text-center text-sm text-gray-500">
+        <div className="mt-6 text-center text-sm text-gray-500 dark:text-slate-400">
           Already have an account?{" "}
           <Link
             to="/login"
-            className="text-emerald-600 hover:underline"
+            className="text-emerald-600 hover:underline dark:text-emerald-400"
           >
             Sign In
           </Link>
         </div>
 
         {/* Disclaimer */}
-        <p className="mt-4 text-xs text-gray-400 text-center">
+        <p className="mt-4 text-xs text-gray-400 text-center dark:text-slate-500">
           This platform provides screening support and does not replace
           professional medical diagnosis.
         </p>

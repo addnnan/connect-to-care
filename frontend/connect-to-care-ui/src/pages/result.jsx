@@ -3,10 +3,55 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import { motion } from "framer-motion";
 import { Download, AlertTriangle, CheckCircle, Info, ArrowRight } from "lucide-react";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, Cell } from "recharts";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
+};
+
+function isAutismType(type) {
+  return type === "autism" || type === "autism-followup";
+}
+
+function screeningTitle(type) {
+  if (type === "autism")          return "Autism Screening Result";
+  if (type === "autism-followup") return "Autism Follow-Up Result";
+  if (type === "adhd")            return "ADHD Screening Result";
+  return "Screening Result";
+}
+
+function scoreDisplay(type, score) {
+  if (isAutismType(type)) return `${score}/20`;
+  return `${score}%`;
+}
+
+const CustomTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    const isCritical = data.weight >= 0.1;
+    return (
+      <div className={`p-4 rounded-2xl border shadow-xl max-w-sm
+        ${isCritical
+          ? "border-amber-200 dark:border-amber-800 bg-amber-50/95 dark:bg-amber-950/95"
+          : "border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95"
+        }`}>
+        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+          Question {data.num} ({data.domain})
+        </p>
+        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 mt-1 leading-relaxed">
+          {data.question}
+        </p>
+        <div className="mt-3 flex justify-between items-center border-t border-gray-200/50 dark:border-gray-700 pt-2">
+          <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">Clinical Severity Weight</span>
+          <span className={`text-sm font-bold ${isCritical ? "text-amber-700 dark:text-amber-400" : "text-gray-700 dark:text-gray-300"}`}>
+            {data.weight.toFixed(2)}
+          </span>
+        </div>
+      </div>
+    );
+  }
+  return null;
 };
 
 export default function Result() {
@@ -14,20 +59,19 @@ export default function Result() {
   const [downloading, setDownloading] = useState(false);
   const { id } = useParams();
 
-  const handleDownloadReport = async () => {
+  const handlePayAndDownload = async () => {
     setDownloading(true);
     try {
-      const response = await api.get(`/reports/${id}`, { responseType: "blob" });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `assessment-report-${id}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      const response = await api.post("/create-checkout-session", { assessment_id: id });
+      const { checkout_url } = response.data;
+      if (checkout_url) {
+        window.location.href = checkout_url;
+      } else {
+        alert("Failed to initiate payment session. Please try again.");
+      }
     } catch (err) {
-      console.error("PDF download failed", err);
+      console.error("Stripe Checkout failed", err);
+      alert("Error initiating payment checkout.");
     } finally {
       setDownloading(false);
     }
@@ -47,8 +91,8 @@ export default function Result() {
 
   if (!assessment) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading...
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+        <p className="text-gray-500 dark:text-gray-400">Loading...</p>
       </div>
     );
   }
@@ -60,81 +104,81 @@ export default function Result() {
     domainPercentages = assessment.details?.domainPercentages || {},
   } = assessment;
 
+  const chartData = (assessment.details?.sortedFailedQuestions || []).map((item) => ({
+    name: `Q${item.num}`,
+    weight: item.weight,
+    question: item.question,
+    domain: item.domain,
+    num: item.num,
+  }));
+
   const riskConfig = {
     Low: {
       icon: CheckCircle,
-      badge: "text-emerald-700",
-      bg: "bg-emerald-50",
-      border: "border-emerald-300",
-      title: "Low likelihood indicators",
-      description:
-        "Current responses show fewer behavioral indicators commonly associated with developmental concerns.",
+      badge:       "text-emerald-700 dark:text-emerald-400",
+      bg:          "bg-emerald-50 dark:bg-emerald-950",
+      border:      "border-emerald-300 dark:border-emerald-800",
+      description: "Current responses show fewer behavioral indicators commonly associated with developmental concerns.",
     },
     Moderate: {
       icon: Info,
-      badge: "text-amber-700",
-      bg: "bg-amber-50",
-      border: "border-amber-300",
-      title: "Moderate likelihood indicators",
-      description:
-        "Some behavioral patterns may benefit from closer observation or additional screening.",
+      badge:       "text-amber-700 dark:text-amber-400",
+      bg:          "bg-amber-50 dark:bg-amber-950",
+      border:      "border-amber-300 dark:border-amber-800",
+      description: "Some behavioral patterns may benefit from closer observation or additional screening.",
     },
     High: {
       icon: AlertTriangle,
-      badge: "text-rose-700",
-      bg: "bg-rose-50",
-      border: "border-rose-300",
-      title: "Higher likelihood indicators",
-      description:
-        "Several behavioral indicators suggest that professional evaluation could be helpful.",
+      badge:       "text-rose-700 dark:text-rose-400",
+      bg:          "bg-rose-50 dark:bg-rose-950",
+      border:      "border-rose-300 dark:border-rose-800",
+      description: "Several behavioral indicators suggest that professional evaluation could be helpful.",
     },
   };
 
-  const config = riskConfig[risk];
+  const config = riskConfig[risk] || riskConfig.Low;
   const Icon = config.icon;
 
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-12">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950 px-4 py-12">
       <motion.div
         initial="hidden"
         animate="visible"
         variants={fadeUp}
         transition={{ duration: 0.5 }}
-        className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-6 sm:p-10"
+        className="max-w-3xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-xl dark:shadow-black/40 p-6 sm:p-10"
       >
         {/* Header */}
         <div className="text-center mb-10">
           <div className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full ${config.bg}`}>
             <Icon className={`h-8 w-8 ${config.badge}`} />
           </div>
-          <h1 className="text-3xl font-semibold text-gray-900">
-            {type === "autism" ? "Autism" : "ADHD"} Screening Result
+          <h1 className="text-3xl font-semibold text-gray-900 dark:text-gray-100">
+            {screeningTitle(type)}
           </h1>
-          <p className="mt-2 text-gray-600">AI-assisted early screening summary</p>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">Early screening summary</p>
         </div>
 
         {/* Score Overview */}
         <div className={`rounded-xl border ${config.border} ${config.bg} p-6 mb-10`}>
           <div className="flex flex-col sm:flex-row sm:justify-between gap-6">
             <div>
-              <p className="text-sm text-gray-600">Overall Screening Score</p>
-              {type === "autism" ? (
-                <p className="text-4xl font-bold text-gray-900 mt-1">{finalScore}/20</p>
-              ) : (
-                <p className="text-4xl font-bold text-gray-900 mt-1">{finalScore}%</p>
-              )}
+              <p className="text-sm text-gray-600 dark:text-gray-400">Overall Screening Score</p>
+              <p className="text-4xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+                {scoreDisplay(type, finalScore)}
+              </p>
               <span className={`inline-block mt-2 px-3 py-1 rounded-full text-sm font-medium ${config.badge}`}>
                 {risk} likelihood
               </span>
             </div>
-            <p className="text-sm text-gray-700 max-w-sm">{config.description}</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300 max-w-sm">{config.description}</p>
           </div>
         </div>
 
         {/* Explainability */}
         <section className="mb-10">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">Why this result?</h2>
-          <p className="text-gray-600 text-sm">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Why this result?</h2>
+          <p className="text-gray-600 dark:text-gray-400 text-sm">
             This screening result is based on domain-wise behavioral responses.
             Domains with consistently higher scores contributed more strongly to
             the final likelihood level.
@@ -144,16 +188,19 @@ export default function Result() {
         {/* Domain Breakdown */}
         {Object.keys(domainPercentages).length > 0 && (
           <section className="mb-12">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Domain breakdown</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Domain breakdown</h3>
             <div className="space-y-4">
               {Object.entries(domainPercentages).map(([domain, value]) => (
                 <div key={domain}>
-                  <div className="flex justify-between text-sm text-gray-700 mb-1">
+                  <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-1">
                     <span className="capitalize">{domain}</span>
                     <span>{value}%</span>
                   </div>
-                  <div className="h-2 rounded-full bg-gray-200">
-                    <div className="h-2 rounded-full bg-gray-800" style={{ width: `${value}%` }} />
+                  <div className="h-2 rounded-full bg-gray-200 dark:bg-gray-700">
+                    <div
+                      className="h-2 rounded-full bg-gray-800 dark:bg-gray-300"
+                      style={{ width: `${value}%` }}
+                    />
                   </div>
                 </div>
               ))}
@@ -161,57 +208,118 @@ export default function Result() {
           </section>
         )}
 
+        {/* Critical Indicators chart */}
+        {assessment.details?.sortedFailedQuestions?.length > 0 && (
+          <section className="mb-12">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              Critical Behavioral Indicators (ML Priority Chart)
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+              The following chart displays the child's flagged responses sorted by their clinical
+              significance (weight). Hover over each bar to review full behavioral details and
+              domain categories.
+            </p>
+            <div className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl p-6 shadow-sm">
+              <div className="h-80 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={chartData}
+                    layout="vertical"
+                    margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
+                  >
+                    <XAxis
+                      type="number"
+                      domain={[0, 0.3]}
+                      tickFormatter={(val) => val.toFixed(2)}
+                      stroke="#6b7280"
+                      fontSize={11}
+                    />
+                    <YAxis
+                      dataKey="name"
+                      type="category"
+                      width={40}
+                      stroke="#6b7280"
+                      fontSize={11}
+                      tickLine={false}
+                    />
+                    <RechartsTooltip
+                      content={<CustomTooltip />}
+                      cursor={{ fill: "rgba(255,255,255,0.04)" }}
+                    />
+                    <Bar dataKey="weight" radius={[0, 4, 4, 0]} barSize={16}>
+                      {chartData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={entry.weight >= 0.1 ? "#d97706" : "#10b981"}
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-4 items-center justify-center text-xs border-t border-gray-100 dark:border-gray-700 pt-4">
+                <span className="flex items-center gap-1.5 font-medium text-gray-600 dark:text-gray-400">
+                  <span className="w-3 h-3 rounded bg-[#d97706] inline-block" />
+                  Critical Predictor (&ge; 0.10)
+                </span>
+                <span className="flex items-center gap-1.5 font-medium text-gray-600 dark:text-gray-400">
+                  <span className="w-3 h-3 rounded bg-[#10b981] inline-block" />
+                  Baseline Predictor (&lt; 0.10)
+                </span>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Next Actions */}
         <section className="space-y-3">
-
-          {/* Download PDF — first and most prominent */}
           <button
-            onClick={handleDownloadReport}
+            onClick={handlePayAndDownload}
             disabled={downloading}
-            className="flex items-center justify-between w-full rounded-lg border border-emerald-200 bg-emerald-50 px-5 py-4 hover:bg-emerald-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-between w-full rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950 px-5 py-4 hover:bg-emerald-100 dark:hover:bg-emerald-900 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <div className="flex items-center gap-3">
-              <Download className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+              <Download className="h-4 w-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
               <div className="text-left">
-                <p className="font-medium text-emerald-800 text-sm">
-                  {downloading ? "Generating report…" : "Download PDF report"}
+                <p className="font-medium text-emerald-800 dark:text-emerald-300 text-sm">
+                  {downloading ? "Initiating Checkout…" : "Pay & Download Official Report ($5.00)"}
                 </p>
-                <p className="text-xs text-emerald-600 mt-0.5">
-                  Full summary with domain breakdown and recommendations
+                <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5">
+                  Get your official PDF clinical report with ML severity analysis
                 </p>
               </div>
             </div>
-            <ArrowRight className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+            <ArrowRight className="h-4 w-4 text-emerald-500 dark:text-emerald-400 flex-shrink-0" />
           </button>
 
           {(risk === "Moderate" || risk === "High") && (
             <Link
               to="/detection/detailed"
-              className="flex items-center justify-between rounded-lg border px-5 py-4 hover:bg-gray-50 transition"
+              className="flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 px-5 py-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
             >
-              <span className="font-medium text-gray-800">
+              <span className="font-medium text-gray-800 dark:text-gray-200">
                 Take a detailed behavioral assessment
               </span>
-              <ArrowRight className="h-4 w-4 text-gray-500" />
+              <ArrowRight className="h-4 w-4 text-gray-500 dark:text-gray-400" />
             </Link>
           )}
 
           <Link
-            to={`/care-guidance/${type}`}
-            className="flex items-center justify-between rounded-lg border px-5 py-4 hover:bg-gray-50 transition"
+            to={`/care-guidance/${isAutismType(type) ? "autism" : "adhd"}`}
+            className="flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 px-5 py-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
           >
-            <span className="font-medium text-gray-800">
+            <span className="font-medium text-gray-800 dark:text-gray-200">
               Find nearest healthcare professionals
             </span>
-            <ArrowRight className="h-4 w-4 text-gray-500" />
+            <ArrowRight className="h-4 w-4 text-gray-500 dark:text-gray-400" />
           </Link>
         </section>
 
         {/* Disclaimer */}
-        <p className="mt-10 text-xs text-gray-400 text-center">
-          This tool provides AI-assisted early screening only and does not offer a
-          medical diagnosis. Always consult qualified healthcare professionals for
-          clinical evaluation.
+        <p className="mt-10 text-xs text-gray-400 dark:text-gray-500 text-center">
+          This tool provides early screening only and does not offer a medical diagnosis.
+          Always consult qualified healthcare professionals for clinical evaluation.
         </p>
       </motion.div>
     </main>

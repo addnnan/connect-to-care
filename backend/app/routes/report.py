@@ -1,8 +1,14 @@
 import io
+import os
+import stripe
 from datetime import datetime
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from fastapi.responses import StreamingResponse
+from dotenv import load_dotenv
+
+load_dotenv()
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 from reportlab.platypus import (
     SimpleDocTemplate,
     Paragraph,
@@ -142,11 +148,61 @@ def build_styles(accent):
     }
 
 # ── Route ─────────────────────────────────────────────────────────────────────
-@router.get("/reports/{assessment_id}")
-async def generate_report(assessment_id: str):
-    if not ObjectId.is_valid(assessment_id):
-        raise HTTPException(status_code=400, detail="Invalid Assessment ID configuration")
+from pydantic import BaseModel
+
+class CheckoutSessionRequest(BaseModel):
+    assessment_id: str
+
+@router.post("/create-checkout-session")
+def create_checkout_session(req: CheckoutSessionRequest):
+    if not ObjectId.is_valid(req.assessment_id):
+        raise HTTPException(status_code=400, detail="Invalid assessment ID")
         
+    assessment = assessment_collection.find_one({"_id": ObjectId(req.assessment_id)})
+    if not assessment:
+        raise HTTPException(status_code=404, detail="Assessment not found")
+        
+    try:
+        session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            line_items=[
+                {
+                    "price_data": {
+                        "currency": "usd",
+                        "product_data": {
+                            "name": "ConnectToCare Clinical Report",
+                            "description": f"Official screening assessment report for {assessment.get('type', 'screening').capitalize()}"
+                        },
+                        "unit_amount": 500, # $5.00 USD
+                    },
+                    "quantity": 1,
+                }
+            ],
+            mode="payment",
+            metadata={
+                "assessment_id": req.assessment_id
+            },
+            success_url=f"http://localhost:3000/success?session_id={{CHECKOUT_SESSION_ID}}",
+            cancel_url=f"http://localhost:3000/result/{req.assessment_id}",
+        )
+        return {"checkout_url": session.url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/reports/download/{session_id}")
+async def generate_report(session_id: str):
+    try:
+        session = stripe.checkout.Session.retrieve(session_id)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Invalid Stripe Session: {str(e)}")
+        
+    if session.payment_status != "paid":
+        raise HTTPException(status_code=402, detail="Payment required to download this report.")
+        
+    assessment_id = getattr(session.metadata, "assessment_id", None)
+    if not assessment_id or not ObjectId.is_valid(assessment_id):
+        raise HTTPException(status_code=400, detail="No valid assessment linked to this payment session.")
+
     assessment = assessment_collection.find_one({"_id": ObjectId(assessment_id)})
     if not assessment:
         raise HTTPException(status_code=404, detail="Assessment not found")
@@ -239,6 +295,58 @@ async def generate_report(assessment_id: str):
         elements.append(Spacer(1, 4 * mm))
         for domain, value in domain_scores.items():
             elements.append(domain_row(domain, int(value), usable_w))
+        elements.append(PageBreak())
+
+    # ── Critical Behavioral Indicators (ML Sorted) ────────────────────────────
+    sorted_failed = assessment.get("details", {}).get("sortedFailedQuestions", [])
+    if sorted_failed:
+        elements.append(section_header("Critical Behavioral Indicators (ML Severity Sorted)", usable_w))
+        elements.append(Spacer(1, 4 * mm))
+        
+        s_crit_idx = ParagraphStyle("sCritIdx", fontSize=9, textColor=GRAY_500, fontName="Helvetica-Bold", leading=14, alignment=TA_CENTER)
+        s_crit_text = ParagraphStyle("sCritText", fontSize=9, textColor=GRAY_900, leading=14, fontName="Helvetica-Bold")
+        s_crit_domain = ParagraphStyle("sCritDomain", fontSize=8, textColor=GRAY_500, leading=11, fontName="Helvetica")
+        s_crit_weight_label = ParagraphStyle("sCritWLabel", fontSize=8, textColor=GRAY_500, leading=11, fontName="Helvetica-Bold")
+        s_crit_weight_val_critical = ParagraphStyle("sCritWValCrit", fontSize=9, textColor=colors.HexColor("#b45309"), leading=13, fontName="Helvetica-Bold")
+        s_crit_weight_val_normal = ParagraphStyle("sCritWValNorm", fontSize=9, textColor=GRAY_700, leading=13, fontName="Helvetica-Bold")
+        
+        for index, item in enumerate(sorted_failed, start=1):
+            q_num = item.get("num")
+            q_text = item.get("question", "")
+            q_domain = item.get("domain", "").capitalize()
+            q_weight = item.get("weight", 0.02)
+            
+            is_critical = q_weight >= 0.1
+            row_bg = colors.HexColor("#fffbeb") if is_critical else colors.HexColor("#fafafa")
+            val_style = s_crit_weight_val_critical if is_critical else s_crit_weight_val_normal
+            
+            q_table = Table(
+                [[
+                    Paragraph(f"{q_num}", s_crit_idx),
+                    Table([
+                        [Paragraph(q_text, s_crit_text)],
+                        [Paragraph(f"Domain: {q_domain}", s_crit_domain)]
+                    ], colWidths=[usable_w - 10 * mm - (usable_w * 0.28) - 12]),
+                    Table([
+                        [Paragraph("SEVERITY WEIGHT", s_crit_weight_label)],
+                        [Paragraph(f"{q_weight}", val_style)]
+                    ], colWidths=[usable_w * 0.28])
+                ]],
+                colWidths=[10 * mm, usable_w - 10 * mm - (usable_w * 0.28), usable_w * 0.28]
+            )
+            q_table.setStyle(TableStyle([
+                ("BACKGROUND",    (0, 0), (-1, -1), row_bg),
+                ("VALIGN",        (0, 0), (-1, -1), "TOP"),
+                ("LEFTPADDING",   (0, 0), (-1, -1), 6),
+                ("RIGHTPADDING",  (0, 0), (-1, -1), 6),
+                ("TOPPADDING",    (0, 0), (-1, -1), 8),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+                ("LINEBELOW",     (0, 0), (-1, -1), 0.5, colors.HexColor("#e5e7eb")),
+            ]))
+            elements.append(q_table)
+            elements.append(Spacer(1, 2 * mm))
+            
+        elements.append(Spacer(1, 6 * mm))
         elements.append(PageBreak())
 
     # ── Questions & responses ─────────────────────────────────────────────────

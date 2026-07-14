@@ -4,15 +4,30 @@ import { ArrowLeft, Play, Pause, RotateCcw, Coffee, Zap } from "lucide-react";
 
 // ─── Modes ────────────────────────────────────────────────────────────────────
 const MODES = {
-  focus: { label: "Focus", minutes: 10, color: "indigo" },
-  short: { label: "Short break", minutes: 3, color: "emerald" },
-  long:  { label: "Long break", minutes: 8, color: "amber" },
+  focus: { label: "Focus", minutes: 10, color: "focus" },
+  short: { label: "Short break", minutes: 3, color: "short" },
+  long:  { label: "Long break", minutes: 8, color: "long" },
 };
 
 const COLOR_MAP = {
-  indigo:  { bg: "bg-indigo-600",  ring: "stroke-indigo-600",  light: "bg-indigo-50",  text: "text-indigo-700" },
-  emerald: { bg: "bg-emerald-600", ring: "stroke-emerald-600", light: "bg-emerald-50", text: "text-emerald-700" },
-  amber:   { bg: "bg-amber-500",   ring: "stroke-amber-500",   light: "bg-amber-50",   text: "text-amber-700" },
+  focus: { 
+    bg: "bg-indigo-600 dark:bg-indigo-600", 
+    ring: "stroke-indigo-600 dark:stroke-indigo-500", 
+    light: "bg-indigo-50 dark:bg-indigo-950/40", 
+    text: "text-indigo-700 dark:text-indigo-400" 
+  },
+  short: { 
+    bg: "bg-emerald-600 dark:bg-emerald-600", 
+    ring: "stroke-emerald-600 dark:stroke-emerald-500", 
+    light: "bg-emerald-50 dark:bg-emerald-950/40", 
+    text: "text-emerald-700 dark:text-emerald-400" 
+  },
+  long: { 
+    bg: "bg-amber-500 dark:bg-amber-500", 
+    ring: "stroke-amber-500 dark:stroke-amber-500", 
+    light: "bg-amber-50 dark:bg-amber-950/30", 
+    text: "text-amber-700 dark:text-amber-400" 
+  },
 };
 
 function formatTime(totalSeconds) {
@@ -72,32 +87,32 @@ export default function FocusTimer() {
   const isFinished = secondsLeft === 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-10">
-      <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-lg p-6 sm:p-8">
+    <div className="min-h-screen bg-gray-50 px-4 py-10 transition-colors duration-300 dark:bg-slate-950">
+      <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-transparent dark:bg-slate-900 dark:border-slate-800">
 
         <Link
           to="/adhd"
-          className="flex items-center gap-1 text-sm text-gray-600 hover:text-indigo-600 transition mb-6"
+          className="flex items-center gap-1 text-sm text-gray-600 hover:text-indigo-600 transition dark:text-slate-400 dark:hover:text-indigo-400"
         >
           <ArrowLeft className="h-4 w-4" /> Back to ADHD Module
         </Link>
 
-        <div className="mb-6">
-          <span className="text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-full px-3 py-1">
+        <div className="mb-6 mt-2">
+          <span className="text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-full px-3 py-1 dark:bg-indigo-950/40 dark:border-indigo-800 dark:text-indigo-400">
             Focus Timer
           </span>
         </div>
 
         {/* Mode tabs */}
-        <div className="flex gap-2 mb-8">
+        <div className="flex gap-2 mb-8 bg-gray-50 p-1.5 rounded-xl dark:bg-slate-950">
           {Object.entries(MODES).map(([key, m]) => (
             <button
               key={key}
               onClick={() => switchMode(key)}
               className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition
                 ${mode === key
-                  ? `${COLOR_MAP[m.color].light} ${COLOR_MAP[m.color].text}`
-                  : "text-gray-500 hover:bg-gray-50"}`}
+                  ? `${COLOR_MAP[m.color].light} ${COLOR_MAP[m.color].text} shadow-sm bg-white dark:bg-slate-900`
+                  : "text-gray-500 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-800/60"}`}
             >
               {m.label}
             </button>
@@ -111,6 +126,7 @@ export default function FocusTimer() {
               <circle
                 cx="110" cy="110" r={radius}
                 fill="none" stroke="#e5e7eb" strokeWidth="12"
+                className="dark:stroke-slate-800"
               />
               <circle
                 cx="110" cy="110" r={radius}
@@ -123,16 +139,16 @@ export default function FocusTimer() {
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-4xl font-bold text-gray-900 tabular-nums">
+              <span className="text-4xl font-bold text-gray-900 tabular-nums dark:text-white">
                 {formatTime(secondsLeft)}
               </span>
-              <span className="text-xs text-gray-400 mt-1">{MODES[mode].label}</span>
+              <span className="text-xs text-gray-400 mt-1 dark:text-slate-500">{MODES[mode].label}</span>
             </div>
           </div>
         </div>
 
         {isFinished && (
-          <div className={`text-center mb-6 ${colors.light} rounded-xl p-4`}>
+          <div className={`text-center mb-6 rounded-xl p-4 ${colors.light}`}>
             <p className={`text-sm font-medium ${colors.text}`}>
               {mode === "focus" ? "Nice work! Time for a break." : "Break's over — ready to focus?"}
             </p>
@@ -143,14 +159,14 @@ export default function FocusTimer() {
         <div className="flex items-center justify-center gap-4 mb-8">
           <button
             onClick={handleReset}
-            className="flex items-center justify-center h-12 w-12 rounded-full border border-gray-200 text-gray-500 hover:bg-gray-50 transition"
+            className="flex items-center justify-center h-12 w-12 rounded-full border border-gray-200 text-gray-500 hover:bg-gray-50 transition dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
           >
             <RotateCcw className="h-5 w-5" />
           </button>
           <button
             onClick={() => setRunning((r) => !r)}
             disabled={isFinished}
-            className={`flex items-center justify-center h-16 w-16 rounded-full ${colors.bg} text-white hover:opacity-90 transition disabled:opacity-40`}
+            className={`flex items-center justify-center h-16 w-16 rounded-full text-white hover:opacity-95 transition disabled:opacity-40 ${colors.bg}`}
           >
             {running ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6 ml-0.5" />}
           </button>
@@ -158,21 +174,21 @@ export default function FocusTimer() {
         </div>
 
         {/* Session counter */}
-        <div className="flex items-center justify-center gap-2 text-sm text-gray-500 mb-6">
-          <Zap className="h-4 w-4 text-indigo-400" />
+        <div className="flex items-center justify-center gap-2 text-sm text-gray-500 mb-6 dark:text-slate-400">
+          <Zap className="h-4 w-4 text-indigo-500 dark:text-indigo-400" />
           {completedFocusSessions} focus session{completedFocusSessions !== 1 ? "s" : ""} completed today
         </div>
 
-        <div className="bg-gray-50 rounded-xl p-4 flex gap-3">
-          <Coffee className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-gray-500 leading-relaxed">
+        <div className="bg-gray-50 rounded-xl p-4 flex gap-3 dark:bg-slate-950">
+          <Coffee className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5 dark:text-slate-500" />
+          <p className="text-xs text-gray-500 leading-relaxed dark:text-slate-400">
             Tip: start with just one focus session. Short, consistent bursts
             work better than long stretches. Take the break seriously —
             stand up and move around.
           </p>
         </div>
 
-        <p className="mt-6 text-xs text-gray-400 text-center">
+        <p className="mt-6 text-xs text-gray-400 text-center dark:text-slate-500">
           A simple focus/break timer to support sustained attention in short,
           manageable bursts.
         </p>

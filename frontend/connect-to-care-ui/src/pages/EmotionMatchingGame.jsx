@@ -13,7 +13,6 @@ const EMOTIONS = [
 ];
 
 // ─── Face renderer — real SVG paths, one per emotion ─────────────────────────
-// viewBox is 0 0 100 100, face circle fills the area, features drawn as paths
 function FaceSVG({ emotion, size = 80 }) {
   const e = EMOTIONS.find((x) => x.id === emotion);
   if (!e) return null;
@@ -165,18 +164,18 @@ export default function EmotionMatchingGame() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-10">
-      <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-lg p-6 sm:p-8">
+    <div className="min-h-screen bg-gray-50 px-4 py-10 transition-colors duration-300 dark:bg-slate-950">
+      <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-transparent dark:bg-slate-900 dark:border-slate-800">
 
         <Link
           to="/autism"
-          className="flex items-center gap-1 text-sm text-gray-600 hover:text-emerald-600 transition mb-6"
+          className="flex items-center gap-1 text-sm text-gray-600 hover:text-emerald-600 transition dark:text-slate-400 dark:hover:text-emerald-400"
         >
           <ArrowLeft className="h-4 w-4" /> Back to Autism Module
         </Link>
 
-        <div className="mb-6">
-          <span className="text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1">
+        <div className="mb-6 mt-2">
+          <span className="text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1 dark:bg-emerald-950/40 dark:border-emerald-800 dark:text-emerald-400">
             Emotion Matching Game
           </span>
         </div>
@@ -184,20 +183,20 @@ export default function EmotionMatchingGame() {
         {!finished ? (
           <>
             <div className="flex justify-between items-center mb-6">
-              <p className="text-sm text-gray-500">Round {round + 1} of 6</p>
-              <p className="text-sm text-gray-500">Score: {score}</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400">Round {round + 1} of 6</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400">Score: {score}</p>
             </div>
 
-            <div className="w-full h-2 bg-gray-200 rounded-full mb-8">
+            <div className="w-full h-2 bg-gray-200 rounded-full mb-8 dark:bg-slate-800">
               <div
-                className="h-2 bg-emerald-600 rounded-full transition-all duration-300"
+                className="h-2 bg-emerald-600 rounded-full transition-all duration-300 dark:bg-emerald-500"
                 style={{ width: `${((round + 1) / 6) * 100}%` }}
               />
             </div>
 
             <div className="text-center mb-8">
-              <p className="text-gray-600 mb-1">Which face looks</p>
-              <h2 className="text-2xl font-semibold text-gray-900">
+              <p className="text-gray-600 mb-1 dark:text-slate-400">Which face looks</p>
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
                 {targetEmotion?.label}?
               </h2>
             </div>
@@ -206,13 +205,14 @@ export default function EmotionMatchingGame() {
               {options.map((opt) => {
                 const isSelected = selected === opt.id;
                 const isCorrectAnswer = opt.id === targetEmotion?.id;
-                let ring = "border-gray-200 hover:border-gray-300";
+                let ring = "border-gray-200 hover:border-gray-300 dark:border-slate-700 dark:hover:border-slate-600";
+                
                 if (feedback && isSelected && feedback === "correct") {
-                  ring = "border-emerald-500 bg-emerald-50";
+                  ring = "border-emerald-500 bg-emerald-50 dark:border-emerald-500 dark:bg-emerald-950/30";
                 } else if (feedback && isSelected && feedback === "incorrect") {
-                  ring = "border-red-400 bg-red-50";
+                  ring = "border-red-400 bg-red-50 dark:border-red-500 dark:bg-red-950/30";
                 } else if (feedback && isCorrectAnswer) {
-                  ring = "border-emerald-500 bg-emerald-50";
+                  ring = "border-emerald-500 bg-emerald-50 dark:border-emerald-500 dark:bg-emerald-950/30";
                 }
 
                 return (
@@ -220,10 +220,10 @@ export default function EmotionMatchingGame() {
                     key={opt.id}
                     onClick={() => handleSelect(opt.id)}
                     disabled={!!feedback}
-                    className={`flex flex-col items-center gap-3 rounded-2xl border-2 p-5 transition ${ring} disabled:cursor-default`}
+                    className={`flex flex-col items-center gap-3 rounded-2xl border-2 p-5 transition bg-white dark:bg-slate-800 ${ring} disabled:cursor-default`}
                   >
                     <FaceSVG emotion={opt.id} size={64} />
-                    <span className="text-sm font-medium text-gray-700">{opt.label}</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{opt.label}</span>
                   </button>
                 );
               })}
@@ -231,12 +231,12 @@ export default function EmotionMatchingGame() {
 
             {feedback && (
               <div className="text-center mb-6">
-                <p className={`text-sm font-medium ${feedback === "correct" ? "text-emerald-600" : "text-red-500"}`}>
+                <p className={`text-sm font-medium ${feedback === "correct" ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"}`}>
                   {feedback === "correct" ? "That's right!" : `Not quite — that's ${targetEmotion.label}`}
                 </p>
                 <button
                   onClick={handleNext}
-                  className="mt-4 rounded-lg bg-emerald-600 px-6 py-2.5 text-white text-sm font-medium hover:bg-emerald-700 transition"
+                  className="mt-4 rounded-lg bg-emerald-600 px-6 py-2.5 text-white text-sm font-medium hover:bg-emerald-700 transition dark:bg-emerald-600 dark:hover:bg-emerald-500"
                 >
                   {round + 1 >= 6 ? "See results" : "Next round"}
                 </button>
@@ -245,23 +245,23 @@ export default function EmotionMatchingGame() {
           </>
         ) : (
           <div className="text-center py-8">
-            <Smile className="h-12 w-12 text-emerald-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+            <Smile className="h-12 w-12 text-emerald-500 mx-auto mb-4 dark:text-emerald-400" />
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2 dark:text-white">
               Great job!
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 mb-6 dark:text-slate-400">
               You got {score} out of 6 correct.
             </p>
             <button
               onClick={handleRestart}
-              className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-6 py-2.5 text-white text-sm font-medium hover:bg-emerald-700 transition"
+              className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-6 py-2.5 text-white text-sm font-medium hover:bg-emerald-700 transition dark:bg-emerald-600 dark:hover:bg-emerald-500"
             >
               <RefreshCw className="h-4 w-4" /> Play again
             </button>
           </div>
         )}
 
-        <p className="mt-8 text-xs text-gray-400 text-center">
+        <p className="mt-8 text-xs text-gray-400 text-center dark:text-slate-500">
           A simple, repeatable game to help recognise and name basic emotions
           from facial expressions.
         </p>

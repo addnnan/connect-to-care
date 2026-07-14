@@ -12,10 +12,6 @@ import api from "../services/api";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-// function getItemData(id) {
-//   return mchatFollowUpItems.find((item) => item.id === id);
-// }
-
 // Walk the flowchart for one item given recorded answers { stepId: optionValue }
 // Returns "SCORE_0" | "SCORE_1" | null (incomplete)
 function resolveItemScore(itemData, stepAnswers) {
@@ -66,7 +62,6 @@ export default function MchatFollowUp() {
   const location = useLocation();
 
   // Stage-1 result passed via navigate state
-  // Expected: { elevatedItems: [1,3,7,...], totalElevated, risk, domainPercentages, finalScore }
   const stage1Result = location.state || {};
   const elevatedItemNums = stage1Result.elevatedItems || [];
 
@@ -75,33 +70,27 @@ export default function MchatFollowUp() {
     elevatedItemNums.includes(item.num)
   );
 
-  // currentItemIndex = which item we're on (0-based within followUpItems)
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
-
-  // stepAnswers: { mchat_X: { stepId: optionValue, ... }, ... }
   const [stepAnswers, setStepAnswers] = useState({});
-
-  // itemScores: { mchat_X: 0 | 1 }
   const [itemScores, setItemScores] = useState({});
 
   const totalItems = followUpItems.length;
 
-  // ── Edge case: no elevated items (shouldn't happen but handle gracefully) ──
+  // ── Edge case: no elevated items ──
   if (totalItems === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="max-w-md bg-white rounded-2xl shadow-lg p-8 text-center">
-          <CheckCircle className="h-10 w-10 text-emerald-500 mx-auto mb-3" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 transition-colors duration-300 dark:bg-slate-950">
+        <div className="max-w-md bg-white rounded-2xl shadow-lg p-8 text-center border border-transparent dark:bg-slate-900 dark:border-slate-800">
+          <CheckCircle className="h-10 w-10 text-emerald-500 mx-auto mb-3 dark:text-emerald-400" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2 dark:text-white">
             No follow-up items needed
           </h2>
-          <p className="text-sm text-gray-500 mb-6">
-            There were no elevated items from your stage-1 screening to follow
-            up on.
+          <p className="text-sm text-gray-500 mb-6 dark:text-slate-400">
+            There were no elevated items from your stage-1 screening to follow up on.
           </p>
           <Link
             to="/assessments"
-            className="inline-flex items-center gap-2 text-sm font-medium text-emerald-600 hover:underline"
+            className="inline-flex items-center gap-2 text-sm font-medium text-emerald-600 hover:underline dark:text-emerald-400"
           >
             <ArrowLeft className="h-4 w-4" /> Back to assessments
           </Link>
@@ -119,19 +108,15 @@ export default function MchatFollowUp() {
   const itemComplete = activeStepId === null;
   const resolvedScore = resolveItemScore(currentItem, currentItemAnswers);
 
-  // ── Answer a step ──
   const handleAnswer = (stepId, value) => {
     const newItemAnswers = { ...currentItemAnswers, [stepId]: value };
 
-    // Clear any downstream answers (branching may change path)
-    // Find which steps are downstream from this step given the new value
     const newStepAnswers = {
       ...stepAnswers,
       [currentItem.id]: newItemAnswers,
     };
     setStepAnswers(newStepAnswers);
 
-    // If item is now complete, record its score
     const score = resolveItemScore(currentItem, newItemAnswers);
     if (score !== null) {
       setItemScores((prev) => ({
@@ -141,7 +126,6 @@ export default function MchatFollowUp() {
     }
   };
 
-  // ── Move to next item ──
   const handleNextItem = () => {
     if (currentItemIndex < totalItems - 1) {
       setCurrentItemIndex((i) => i + 1);
@@ -150,16 +134,13 @@ export default function MchatFollowUp() {
     }
   };
 
-  // ── Move to previous item ──
   const handlePrevItem = () => {
     if (currentItemIndex > 0) setCurrentItemIndex((i) => i - 1);
   };
 
-  // ── Submit and calculate follow-up result ──
   const handleSubmit = async () => {
     const allScores = { ...itemScores };
 
-    // Ensure current item score is captured
     const finalCurrentScore = resolveItemScore(currentItem, currentItemAnswers);
     if (finalCurrentScore !== null) {
       allScores[currentItem.id] = finalCurrentScore === "SCORE_1" ? 1 : 0;
@@ -167,7 +148,6 @@ export default function MchatFollowUp() {
 
     const elevatedCount = Object.values(allScores).filter((s) => s === 1).length;
 
-    // M-CHAT-R/F: screen positive if 2+ items score 1 on follow-up
     let risk;
     let recommendation;
 
@@ -181,12 +161,10 @@ export default function MchatFollowUp() {
         "Your child has screened negative on the follow-up. No further action is required unless surveillance indicates elevated likelihood for autism. Your child should be re-screened at future well-child visits.";
     }
 
-    // Recalculate domain percentages based on follow-up scores
     const domainElevated = {};
     const domainTotal = {};
 
     followUpItems.forEach((item) => {
-      // Find domain from autismQuestions via id
       const domain = getDomainForItem(item.id);
       if (!domainTotal[domain]) {
         domainTotal[domain] = 0;
@@ -213,7 +191,6 @@ export default function MchatFollowUp() {
       stage: "followup",
     };
 
-    // Save to localStorage
     const assessmentRecord = {
       id: Date.now(),
       type: "autism-followup",
@@ -224,42 +201,22 @@ export default function MchatFollowUp() {
       details: followUpResult,
     };
 
-    // const existing =
-    //   JSON.parse(localStorage.getItem("connect_to_care_assessments")) || [];
-    // localStorage.setItem(
-    //   "connect_to_care_assessments",
-    //   JSON.stringify([assessmentRecord, ...existing])
-    // );
-
-    const response = await api.post(
-      "/assessments",
-      assessmentRecord
-    );
-
+    const response = await api.post("/assessments", assessmentRecord);
     console.log("Saved assessment:", response.data);
-
     navigate(`/result/${response.data._id}`, { state: followUpResult });
-    
-
-    // navigate(`/result/${assessmentRecord.id}`, { state: followUpResult });
   };
 
-  // ── Progress ──
   const progress = Math.round(((currentItemIndex + 1) / totalItems) * 100);
-
-  // ── Render answered steps for current item (history within item) ──
-  const answeredSteps = currentItem.steps.filter((step) => {
-    return currentItemAnswers[step.id] !== undefined;
-  });
+  const answeredSteps = currentItem.steps.filter((step) => currentItemAnswers[step.id] !== undefined);
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-10">
-      <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-lg p-6 sm:p-8">
+    <div className="min-h-screen bg-gray-50 px-4 py-10 transition-colors duration-300 dark:bg-slate-950">
+      <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-transparent dark:bg-slate-900 dark:border-slate-800">
 
         {/* Back */}
         <Link
           to="/assessments"
-          className="flex items-center gap-1 text-sm text-gray-600 hover:text-emerald-600 transition mb-6"
+          className="flex items-center gap-1 text-sm text-gray-600 hover:text-emerald-600 transition mb-6 dark:text-slate-400 dark:hover:text-emerald-400"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to assessments
@@ -267,18 +224,18 @@ export default function MchatFollowUp() {
 
         {/* Badge */}
         <div className="mb-4 flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1">
+          <span className="text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1 dark:text-emerald-400 dark:bg-emerald-950/40 dark:border-emerald-800">
             M-CHAT-R/F™ · Follow-Up Interview
           </span>
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-gray-400 dark:text-slate-500">
             Stage 2 of 2
           </span>
         </div>
 
         {/* Info banner */}
-        <div className="flex gap-3 bg-amber-50 border border-amber-200 rounded-xl p-3 mb-6">
-          <AlertCircle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-amber-700 leading-relaxed">
+        <div className="flex gap-3 bg-amber-50 border border-amber-200 rounded-xl p-3 mb-6 dark:bg-amber-950/20 dark:border-amber-900/40">
+          <AlertCircle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5 dark:text-amber-400" />
+          <p className="text-xs text-amber-700 leading-relaxed dark:text-amber-300">
             Your child's stage-1 score was <strong>Moderate</strong>. This
             follow-up only covers the {totalItems} item
             {totalItems !== 1 ? "s" : ""} flagged as elevated. Answer based on
@@ -288,22 +245,22 @@ export default function MchatFollowUp() {
 
         {/* Progress */}
         <div className="mb-6">
-          <p className="text-sm text-gray-500 mb-2">
+          <p className="text-sm text-gray-500 mb-2 dark:text-slate-400">
             Item {currentItemIndex + 1} of {totalItems}
           </p>
-          <div className="w-full h-2 bg-gray-200 rounded-full">
+          <div className="w-full h-2 bg-gray-200 rounded-full dark:bg-slate-800">
             <div
-              className="h-2 bg-emerald-600 rounded-full transition-all duration-300"
+              className="h-2 bg-emerald-600 rounded-full transition-all duration-300 dark:bg-emerald-500"
               style={{ width: `${progress}%` }}
             />
           </div>
         </div>
 
         {/* Item header */}
-        <p className="text-xs font-medium text-emerald-600 uppercase tracking-wide mb-1">
-          M-CHAT-R Item {currentItem.num}
+        <p className="text-xs font-medium text-emerald-600 uppercase tracking-wide mb-1 dark:text-emerald-400">
+          M-CHAT-R/F™ Item {currentItem.num}
         </p>
-        <p className="text-sm text-gray-500 italic mb-5 leading-relaxed">
+        <p className="text-sm text-gray-500 italic mb-5 leading-relaxed dark:text-slate-400">
           {currentItem.context}
         </p>
 
@@ -314,12 +271,12 @@ export default function MchatFollowUp() {
           return (
             <div
               key={step.id}
-              className="mb-4 p-4 bg-gray-50 rounded-xl border border-gray-100"
+              className="mb-4 p-4 bg-gray-50 rounded-xl border border-gray-100 dark:bg-slate-800/40 dark:border-slate-800"
             >
-              <p className="text-sm font-medium text-gray-700 mb-1">
+              <p className="text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                 {step.text}
               </p>
-              <p className="text-sm text-emerald-700 font-medium">
+              <p className="text-sm text-emerald-700 font-medium dark:text-emerald-400">
                 ✓ {chosenOption?.label}
               </p>
             </div>
@@ -329,20 +286,20 @@ export default function MchatFollowUp() {
         {/* ── Active step ── */}
         {activeStep && (
           <div className="mb-6">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 leading-snug">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 leading-snug dark:text-white">
               {activeStep.text}
             </h2>
 
             {/* Examples */}
             {activeStep.examples && activeStep.examples.length > 0 && (
-              <div className="mb-4 bg-blue-50 border border-blue-100 rounded-xl p-3">
-                <p className="text-xs font-medium text-blue-700 mb-2 uppercase tracking-wide">
+              <div className="mb-4 bg-blue-50 border border-blue-100 rounded-xl p-3 dark:bg-blue-950/20 dark:border-blue-900/40">
+                <p className="text-xs font-medium text-blue-700 mb-2 uppercase tracking-wide dark:text-blue-400">
                   Examples to ask about:
                 </p>
                 <ul className="space-y-1">
                   {activeStep.examples.map((ex, i) => (
-                    <li key={i} className="text-sm text-blue-800 flex gap-2">
-                      <span className="text-blue-400 flex-shrink-0">•</span>
+                    <li key={i} className="text-sm text-blue-800 flex gap-2 dark:text-blue-300">
+                      <span className="text-blue-400 flex-shrink-0 dark:text-blue-500">•</span>
                       {ex}
                     </li>
                   ))}
@@ -356,10 +313,10 @@ export default function MchatFollowUp() {
                 <button
                   key={opt.value}
                   onClick={() => handleAnswer(activeStepId, opt.value)}
-                  className={`w-full rounded-xl border px-4 py-3.5 text-left text-sm font-medium transition
+                  className={`w-full rounded-xl border px-4 py-3.5 text-left text-sm font-medium transition focus:outline-none
                     ${currentItemAnswers[activeStepId] === opt.value
-                      ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                      : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                      ? "border-emerald-600 bg-emerald-50 text-emerald-700 dark:border-emerald-500 dark:bg-emerald-950/40 dark:text-emerald-400"
+                      : "border-gray-300 text-gray-700 bg-white hover:bg-gray-50 dark:border-slate-700 dark:text-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700/50"
                     }`}
                 >
                   {opt.label}
@@ -374,8 +331,8 @@ export default function MchatFollowUp() {
           <div
             className={`flex items-center gap-2 rounded-xl p-3 mb-6 text-sm font-medium
               ${resolvedScore === "SCORE_0"
-                ? "bg-emerald-50 border border-emerald-200 text-emerald-700"
-                : "bg-red-50 border border-red-200 text-red-700"
+                ? "bg-emerald-50 border border-emerald-200 text-emerald-700 dark:bg-emerald-950/40 dark:border-emerald-900/40 dark:text-emerald-400"
+                : "bg-red-50 border border-red-200 text-red-700 dark:bg-red-950/40 dark:border-red-900/40 dark:text-red-400"
               }`}
           >
             {resolvedScore === "SCORE_0" ? (
@@ -390,11 +347,11 @@ export default function MchatFollowUp() {
         )}
 
         {/* Navigation */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between border-t border-gray-100 pt-5 dark:border-slate-800">
           <button
             onClick={handlePrevItem}
             disabled={currentItemIndex === 0}
-            className="flex items-center gap-2 text-sm text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 text-sm text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed dark:text-slate-400 dark:hover:text-white transition"
           >
             <ArrowLeft className="h-4 w-4" />
             Previous
@@ -403,7 +360,7 @@ export default function MchatFollowUp() {
           <button
             onClick={handleNextItem}
             disabled={!itemComplete}
-            className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 text-white text-sm font-medium hover:bg-emerald-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 text-white text-sm font-medium hover:bg-emerald-700 transition disabled:opacity-50 disabled:cursor-not-allowed dark:bg-emerald-600 dark:hover:bg-emerald-500"
           >
             {currentItemIndex === totalItems - 1 ? "Submit" : "Next item"}
             <ArrowRight className="h-4 w-4" />
@@ -411,9 +368,8 @@ export default function MchatFollowUp() {
         </div>
 
         {/* Disclaimer */}
-        <p className="mt-6 text-xs text-gray-400 text-center">
-          M-CHAT-R/F™ © 2009 Robins, Fein & Barton. Screening tool only — not a
-          medical diagnosis.
+        <p className="mt-6 text-xs text-gray-400 text-center dark:text-slate-500">
+          M-CHAT-R/F™ © 2009 Robins, Fein & Barton. Screening tool only — not a medical diagnosis.
         </p>
       </div>
     </div>

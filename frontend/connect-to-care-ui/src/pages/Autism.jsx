@@ -18,9 +18,6 @@ const fadeUp = {
 };
 
 // ─── Real activity content ────────────────────────────────────────────────────
-// type: "game" → links to a fully interactive page
-// type: "guide" → links to a fully built printable guide page
-// type: "expand" → expands inline with real, usable instructions
 const ACTIVITIES = [
   {
     id: "emotion-matching",
@@ -102,10 +99,10 @@ export default function Autism() {
   const [expandedId, setExpandedId] = useState(null);
 
   return (
-    <main className="bg-gray-50 min-h-screen">
+    <main className="bg-gray-50 min-h-screen transition-colors duration-300 dark:bg-slate-950">
 
       {/* Hero */}
-      <section className="bg-gradient-to-b from-emerald-50 to-white py-20 px-4">
+      <section className="bg-gradient-to-b from-emerald-50 to-white py-20 px-4 dark:from-slate-900 dark:to-slate-950">
         <motion.div
           className="max-w-4xl mx-auto text-center"
           initial="hidden"
@@ -113,10 +110,10 @@ export default function Autism() {
           variants={fadeUp}
           transition={{ duration: 0.2 }}
         >
-          <h1 className="text-4xl sm:text-5xl font-semibold text-gray-900 mb-6">
+          <h1 className="text-4xl sm:text-5xl font-semibold text-gray-900 mb-6 dark:text-white">
             Autism Support Modules
           </h1>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto dark:text-slate-400">
             Structured, gentle activities designed to support communication,
             social interaction, and sensory regulation.
           </p>
@@ -129,13 +126,13 @@ export default function Autism() {
 
           {/* What This Helps With */}
           <motion.div
-            className="bg-white rounded-2xl shadow-sm border p-8"
+            className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 dark:bg-slate-900 dark:border-slate-800"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}
           >
-            <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-6 dark:text-white">
               What This Module Helps With
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -157,18 +154,18 @@ export default function Autism() {
             </div>
           </motion.div>
 
-          {/* Activities — now fully functional */}
+          {/* Activities */}
           <motion.div
-            className="bg-white rounded-2xl shadow-sm border p-8"
+            className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 dark:bg-slate-900 dark:border-slate-800"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}
           >
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2 dark:text-white">
               Activities
             </h2>
-            <p className="text-sm text-gray-500 mb-6">
+            <p className="text-sm text-gray-500 mb-6 dark:text-slate-400">
               Some activities open as interactive tools, others as printable
               guides, and a few expand here with quick instructions.
             </p>
@@ -189,30 +186,30 @@ export default function Autism() {
 
           {/* Next Steps */}
           <motion.div
-            className="bg-emerald-50 border border-emerald-200 rounded-2xl p-8"
+            className="bg-emerald-50 border border-emerald-200 rounded-2xl p-8 dark:bg-slate-900 dark:border-slate-800"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}
           >
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4 dark:text-white">
               Recommended Next Steps
             </h2>
-            <p className="text-gray-700 mb-6">
+            <p className="text-gray-700 mb-6 dark:text-slate-300">
               These modules are designed to support daily development and skill-building.
               For personalized guidance or diagnosis, professional evaluation is recommended.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 to="/care-guidance/autism"
-                className="flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-6 py-3 text-white hover:bg-emerald-700 transition"
+                className="flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-6 py-3 text-white hover:bg-emerald-700 transition dark:bg-emerald-600 dark:hover:bg-emerald-500"
               >
                 Find a healthcare professional
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 to="/assessment/autism"
-                className="flex items-center justify-center gap-2 rounded-lg border border-emerald-600 px-6 py-3 text-emerald-700 hover:bg-emerald-50 transition"
+                className="flex items-center justify-center gap-2 rounded-lg border border-emerald-600 px-6 py-3 text-emerald-700 hover:bg-emerald-50 transition dark:border-emerald-500 dark:text-emerald-400 dark:hover:bg-slate-800"
               >
                 Retake screening assessment
               </Link>
@@ -221,7 +218,7 @@ export default function Autism() {
 
           {/* Disclaimer */}
           <motion.p
-            className="text-xs text-gray-400 text-center max-w-3xl mx-auto"
+            className="text-xs text-gray-400 text-center max-w-3xl mx-auto dark:text-slate-500"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
@@ -242,12 +239,12 @@ export default function Autism() {
 function Feature({ icon: Icon, title, text }) {
   return (
     <div className="flex gap-4">
-      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
+      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 flex-shrink-0 dark:bg-slate-800 dark:text-emerald-400">
         <Icon className="h-6 w-6" />
       </div>
       <div>
-        <h3 className="font-medium text-gray-900">{title}</h3>
-        <p className="text-sm text-gray-600">{text}</p>
+        <h3 className="font-medium text-gray-900 dark:text-white">{title}</h3>
+        <p className="text-sm text-gray-600 dark:text-slate-400">{text}</p>
       </div>
     </div>
   );
@@ -256,60 +253,61 @@ function Feature({ icon: Icon, title, text }) {
 function ActivityRow({ activity, isExpanded, onToggle }) {
   const TypeIcon = activity.type === "game" ? Gamepad2 : activity.type === "guide" ? BookOpen : Brain;
   const typeLabel = activity.type === "game" ? "Interactive" : activity.type === "guide" ? "Printable guide" : "Quick guide";
+  
   const typeColor = activity.type === "game"
-    ? "bg-violet-50 text-violet-700"
+    ? "bg-violet-50 text-violet-700 dark:bg-violet-950/40 dark:text-violet-400"
     : activity.type === "guide"
-    ? "bg-blue-50 text-blue-700"
-    : "bg-emerald-50 text-emerald-700";
+    ? "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400"
+    : "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400";
 
   if (activity.type === "game" || activity.type === "guide") {
     return (
       <Link
         to={activity.to}
-        className="flex items-center justify-between border rounded-xl p-5 hover:bg-gray-50 hover:shadow-sm transition group"
+        className="flex items-center justify-between border border-gray-200 rounded-xl p-5 hover:bg-gray-50 hover:shadow-sm transition group dark:border-slate-800 dark:hover:bg-slate-800/40"
       >
         <div className="flex items-center gap-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 flex-shrink-0">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 flex-shrink-0 dark:bg-slate-800 dark:text-emerald-400">
             <TypeIcon className="h-5 w-5" />
           </div>
           <div>
             <div className="flex items-center gap-2 mb-0.5">
-              <span className="font-medium text-gray-900">{activity.title}</span>
+              <span className="font-medium text-gray-900 dark:text-white">{activity.title}</span>
               <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${typeColor}`}>
                 {typeLabel}
               </span>
             </div>
-            <p className="text-sm text-gray-500">{activity.summary}</p>
+            <p className="text-sm text-gray-500 dark:text-slate-400">{activity.summary}</p>
           </div>
         </div>
-        <ArrowRight className="h-4 w-4 text-gray-400 group-hover:translate-x-1 transition-transform flex-shrink-0 ml-3" />
+        <ArrowRight className="h-4 w-4 text-gray-400 group-hover:translate-x-1 transition-transform flex-shrink-0 ml-3 dark:text-slate-500" />
       </Link>
     );
   }
 
   // Expandable inline guide
   return (
-    <div className="border rounded-xl overflow-hidden">
+    <div className="border border-gray-200 rounded-xl overflow-hidden dark:border-slate-800">
       <button
         onClick={onToggle}
-        className="w-full flex items-center justify-between p-5 hover:bg-gray-50 transition text-left"
+        className="w-full flex items-center justify-between p-5 hover:bg-gray-50 transition text-left dark:hover:bg-slate-800/40"
       >
         <div className="flex items-center gap-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 flex-shrink-0">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 flex-shrink-0 dark:bg-slate-800 dark:text-emerald-400">
             <TypeIcon className="h-5 w-5" />
           </div>
           <div>
             <div className="flex items-center gap-2 mb-0.5">
-              <span className="font-medium text-gray-900">{activity.title}</span>
+              <span className="font-medium text-gray-900 dark:text-white">{activity.title}</span>
               <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${typeColor}`}>
                 {typeLabel}
               </span>
             </div>
-            <p className="text-sm text-gray-500">{activity.summary}</p>
+            <p className="text-sm text-gray-500 dark:text-slate-400">{activity.summary}</p>
           </div>
         </div>
         <ChevronDown
-          className={`h-4 w-4 text-gray-400 flex-shrink-0 ml-3 transition-transform ${isExpanded ? "rotate-180" : ""}`}
+          className={`h-4 w-4 text-gray-400 flex-shrink-0 ml-3 transition-transform dark:text-slate-500 ${isExpanded ? "rotate-180" : ""}`}
         />
       </button>
 
@@ -322,11 +320,11 @@ function ActivityRow({ activity, isExpanded, onToggle }) {
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="px-5 pb-5 pt-1 bg-gray-50 border-t">
+            <div className="px-5 pb-5 pt-1 bg-gray-50 border-t border-gray-200 dark:bg-slate-900/50 dark:border-slate-800">
               <ol className="space-y-2 mt-3">
                 {activity.detail.steps.map((step, i) => (
-                  <li key={i} className="flex gap-3 text-sm text-gray-700">
-                    <span className="flex-shrink-0 h-5 w-5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium flex items-center justify-center">
+                  <li key={i} className="flex gap-3 text-sm text-gray-700 dark:text-slate-300">
+                    <span className="flex-shrink-0 h-5 w-5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium flex items-center justify-center dark:bg-emerald-950 dark:text-emerald-400">
                       {i + 1}
                     </span>
                     {step}
