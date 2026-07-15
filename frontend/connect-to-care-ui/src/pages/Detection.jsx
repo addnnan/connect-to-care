@@ -338,12 +338,13 @@ export default function Assessment() {
           </div>
         ) : (
           /* ── ADHD: 0–3 scale ── */
+          
           <div className="flex flex-col gap-2 mb-8 mt-4">
             {scaleOptions.map((opt) => (
               <button
                 key={opt.value}
                 onClick={() => handleAnswer(opt.value)}
-                className={`w-full rounded-lg border px-4 py-3 text-left transition ${
+                className={`w-full rounded-lg border px-4 py-3 text-left transition ${language === "ur" ? "text-right" : "text-left"} ${
                   currentAnswer === opt.value
                     ? "border-violet-600 bg-violet-50 dark:border-violet-500 dark:bg-violet-950/40 text-violet-700 dark:text-violet-400"
                     : "border-gray-300 dark:border-slate-700 text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700/50"
