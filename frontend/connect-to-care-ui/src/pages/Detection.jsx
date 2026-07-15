@@ -8,12 +8,47 @@ import { useParams } from "react-router-dom";
 import autismQuestions from "../data/autismQuestions";
 import adhdQuestions from "../data/adhdQuestions";
 import api from "../services/api";
+// import { LanguageProvider } from "../context/LanguageContext";
+import { useLanguage } from "../context/LanguageContext";
+
+
+
+// const scaleOptions = [
+//   { label: "Rarely or Never", value: 0 },
+//   { label: "Sometimes",       value: 1 },
+//   { label: "Often",           value: 2 },
+//   { label: "Very Often",      value: 3 },
+// ];
 
 const scaleOptions = [
-  { label: "Rarely or Never", value: 0 },
-  { label: "Sometimes",       value: 1 },
-  { label: "Often",           value: 2 },
-  { label: "Very Often",      value: 3 },
+  {
+    value: 0,
+    label: {
+      en: "Rarely or Never",
+      ur: "کبھی نہیں",
+    },
+  },
+  {
+    value: 1,
+    label: {
+      en: "Sometimes",
+      ur: "کبھی کبھار",
+    },
+  },
+  {
+    value: 2,
+    label: {
+      en: "Often",
+      ur: "اکثر",
+    },
+  },
+  {
+    value: 3,
+    label: {
+      en: "Very Often",
+      ur: "بہت اکثر",
+    },
+  },
 ];
 
 function calculateAdhdResult(questions, answers) {
@@ -116,11 +151,16 @@ export default function Assessment() {
   const navigate  = useNavigate();
   const { type }  = useParams();
 
+ 
+
   const isAutism        = type === "autism";
   const questions       = isAutism ? autismQuestions : adhdQuestions;
   const totalQuestions  = questions.length;
   const currentQuestion = questions[currentStep];
   const currentAnswer   = answers[currentQuestion.id];
+  const { language, toggleLanguage } = useLanguage();
+
+  
 
   const handleAnswer = (value) =>
     setAnswers((prev) => ({ ...prev, [currentQuestion.id]: value }));
@@ -142,7 +182,7 @@ export default function Assessment() {
 
     const answeredQuestions = questions.map((q) => ({
       id:       q.id,
-      question: q.text,
+      question: q.text.en,
       answer:   answers[q.id],
     }));
 
@@ -166,9 +206,39 @@ export default function Assessment() {
     if (currentStep > 0) setCurrentStep((s) => s - 1);
   };
 
+  const activeBg = type === "adhd" ? "bg-purple-600 dark:bg-purple-600" : "bg-emerald-600 dark:bg-emerald-600";
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 px-4 py-10 transition-colors duration-300">
       <div className="max-w-2xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-lg dark:shadow-black/40 p-6 sm:p-8 border border-transparent dark:border-slate-800">
+      
+      <div className="flex justify-between flex-row-reverse mb-5">
+      {/* Language Toggle */}
+      <div className="flex justify-end mb-5">
+    <div className="flex rounded-full border border-gray-300 dark:border-slate-700 overflow-hidden shadow-sm">
+      <button
+        onClick={() => language !== "en" && toggleLanguage()}
+        className={`px-3 py-1 text-xs font-semibold transition-all duration-200 ${
+          language === "en"
+            ? `${activeBg} text-white`
+            : "bg-white text-gray-700 hover:bg-gray-50 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+        }`}
+      >
+        EN
+      </button>
+
+      <button
+        onClick={() => language !== "ur" && toggleLanguage()}
+        className={`px-3 py-1 text-xs font-semibold transition-all duration-200 ${
+          language === "ur"
+            ? `${activeBg} text-white`
+            : "bg-white text-gray-700 hover:bg-gray-50 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+        }`}
+      >
+        اردو
+      </button>
+    </div>
+  </div>
 
         {/* Back */}
         <Link
@@ -182,6 +252,7 @@ export default function Assessment() {
           <ArrowLeft className="h-4 w-4" />
           Home
         </Link>
+        </div>
 
         {/* Badge */}
         <div className="mb-4">
@@ -230,14 +301,14 @@ export default function Assessment() {
         </span>
 
         {/* Question */}
-        <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-2 leading-snug">
-          {currentQuestion.text}
+        <h2 dir={language === "ur" ? "rtl" : "ltr"} className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-2 leading-snug">
+          {currentQuestion.text[language]}
         </h2>
 
         {/* Example */}
         {currentQuestion.example && (
-          <p className="text-sm text-gray-500 dark:text-slate-400 italic mb-6">
-            {currentQuestion.example}
+          <p dir={language === "ur" ? "rtl" : "ltr"} className="text-sm text-gray-500 dark:text-slate-400 italic mb-6">
+            {currentQuestion.example[language]}
           </p>
         )}
 
@@ -252,7 +323,7 @@ export default function Assessment() {
                   : "border-gray-300 dark:border-slate-700 text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700/50"
               }`}
             >
-              Yes
+              {language === "en" ? "Yes" : "ہاں"}
             </button>
             <button
               onClick={() => handleAnswer("no")}
@@ -262,7 +333,7 @@ export default function Assessment() {
                   : "border-gray-300 dark:border-slate-700 text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700/50"
               }`}
             >
-              No
+              {language === "en" ? "No" : "نہیں"}
             </button>
           </div>
         ) : (
@@ -278,7 +349,7 @@ export default function Assessment() {
                     : "border-gray-300 dark:border-slate-700 text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700/50"
                 }`}
               >
-                {opt.label}
+                {opt.label[language]}
               </button>
             ))}
           </div>
@@ -332,5 +403,6 @@ export default function Assessment() {
 
       </div>
     </div>
+
   );
 }

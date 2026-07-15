@@ -21,10 +21,33 @@ function screeningTitle(type) {
   return "Screening Result";
 }
 
-function scoreDisplay(type, score) {
-  if (isAutismType(type)) return `${score}/20`;
-  return `${score}%`;
+// function scoreDisplay(type, score) {
+//   if (isAutismType(type)) return `${score}/20`;
+//   return `${score}%`;
+// }
+
+function scoreDisplay(type, assessment) {
+    if (!assessment) return "-";
+
+    if (type === "autism") {
+        return `${assessment.details?.finalScore ?? assessment.score}/20`;
+    }
+
+    if (type === "autism-followup") {
+        const score = assessment.details?.finalScore ?? assessment.score;
+        const total =
+            assessment.details?.sortedFailedQuestions?.length ??
+            assessment.details?.itemScores
+                ? Object.keys(assessment.details.itemScores).length
+                : 0;
+
+        return `${score}/${total}`;
+    }
+
+    return `${assessment.details?.finalScore ?? assessment.score}%`;
 }
+
+
 
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
@@ -98,7 +121,7 @@ export default function Result() {
   }
 
   const {
-    finalScore = assessment.details?.finalScore ?? 0,
+    // finalScore = assessment.details?.finalScore ?? 0,
     risk = assessment.result ?? "Low",
     type = assessment.type ?? "autism",
     domainPercentages = assessment.details?.domainPercentages || {},
@@ -165,7 +188,7 @@ export default function Result() {
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Overall Screening Score</p>
               <p className="text-4xl font-bold text-gray-900 dark:text-gray-100 mt-1">
-                {scoreDisplay(type, finalScore)}
+                {scoreDisplay(type, assessment)}
               </p>
               <span className={`inline-block mt-2 px-3 py-1 rounded-full text-sm font-medium ${config.badge}`}>
                 {risk} likelihood
