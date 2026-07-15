@@ -219,7 +219,7 @@ export default function Profile() {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-900 dark:text-white">Autism Screen</p>
-              <p className="text-xs text-gray-400 dark:text-slate-500">M-CHAT-R™</p>
+              <p className="text-xs text-gray-400 dark:text-slate-500">M-CHAT-R/F™</p>
             </div>
           </Link>
           <Link
