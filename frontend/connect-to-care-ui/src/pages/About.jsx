@@ -1,16 +1,30 @@
 import { Brain, ShieldCheck, Users, Target, FileCheck, BarChart3 } from "lucide-react";
 import { motion } from "framer-motion";
 
+const container = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.06 } },
+};
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 14 },
+  visible: {
+    opacity: 1, y: 0,
+    transition: { duration: 0.25, ease: "easeOut" },
+  },
+};
+
 export default function About() {
   return (
-    <motion.main 
-      initial={{ opacity: 0, y: -10 }} 
-      animate={{ opacity: 1, y: 0 }} 
-      className="bg-gray-50 min-h-screen transition-colors duration-300 dark:bg-slate-950"
-    >
+    <div className="bg-gray-50 min-h-screen transition-colors duration-300 dark:bg-slate-950">
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-emerald-50 to-white py-20 px-4 dark:from-slate-900/50 dark:to-slate-950">
+      <motion.section
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.25 }}
+        className="bg-gradient-to-b from-emerald-50 to-white py-20 px-4 dark:from-slate-900/50 dark:to-slate-950"
+      >
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl sm:text-5xl font-semibold text-gray-900 mb-6 dark:text-white">
             About ConnectToCare
@@ -21,14 +35,22 @@ export default function About() {
             and attention-related concerns.
           </p>
         </div>
-      </section>
+      </motion.section>
 
       {/* Content */}
       <section className="py-16 px-4">
-        <div className="max-w-5xl mx-auto grid gap-8">
+        <motion.div
+          className="max-w-5xl mx-auto grid gap-8"
+          initial="hidden"
+          animate="visible"
+          variants={container}
+        >
 
           {/* Mission */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 dark:bg-slate-900 dark:border-slate-800">
+          <motion.div
+            variants={fadeUp}
+            className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 dark:bg-slate-900 dark:border-slate-800"
+          >
             <div className="flex items-center gap-3 mb-4">
               <Target className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
               <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
@@ -41,10 +63,13 @@ export default function About() {
               use, in a format parents can complete at home in minutes, with a
               clear path to professional care if it's needed.
             </p>
-          </div>
+          </motion.div>
 
           {/* Problem */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 dark:bg-slate-900 dark:border-slate-800">
+          <motion.div
+            variants={fadeUp}
+            className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 dark:bg-slate-900 dark:border-slate-800"
+          >
             <div className="flex items-center gap-3 mb-4">
               <Brain className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
               <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
@@ -57,13 +82,16 @@ export default function About() {
               an initial evaluation, and uncertainty about whether a concern is
               worth raising at all. Many families simply don't know where to start.
             </p>
-          </div>
+          </motion.div>
 
           {/* What We Do */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 dark:bg-slate-900 dark:border-slate-800">
+          <motion.div
+            variants={fadeUp}
+            className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 dark:bg-slate-900 dark:border-slate-800"
+          >
             <div className="flex items-center gap-3 mb-4">
               <Users className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
-              <h2 className="text-2xl font-semibold text-gray-990 dark:text-white">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
                 What ConnectToCare Does
               </h2>
             </div>
@@ -91,10 +119,13 @@ export default function About() {
                 Downloadable PDF reports to share with a clinician
               </li>
             </ul>
-          </div>
+          </motion.div>
 
           {/* Responsible Use */}
-          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-8 dark:bg-slate-900 dark:border-slate-800">
+          <motion.div
+            variants={fadeUp}
+            className="bg-emerald-50 border border-emerald-200 rounded-2xl p-8 dark:bg-slate-900 dark:border-slate-800"
+          >
             <div className="flex items-center gap-3 mb-4">
               <ShieldCheck className="h-6 w-6 text-emerald-700 dark:text-emerald-400" />
               <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
@@ -109,10 +140,13 @@ export default function About() {
               is meant to inform a conversation with a qualified healthcare
               professional, not replace one.
             </p>
-          </div>
+          </motion.div>
 
           {/* Who It's For */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 dark:bg-slate-900 dark:border-slate-800">
+          <motion.div
+            variants={fadeUp}
+            className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 dark:bg-slate-900 dark:border-slate-800"
+          >
             <h2 className="text-2xl font-semibold text-gray-900 mb-4 dark:text-white">
               Who This Platform Is For
             </h2>
@@ -127,19 +161,22 @@ export default function About() {
                 Healthcare professionals offering care services
               </li>
             </ul>
-          </div>
+          </motion.div>
 
           {/* Academic Context */}
-          <div className="text-center pt-8 border-t border-gray-200 dark:border-slate-800">
+          <motion.div
+            variants={fadeUp}
+            className="text-center pt-8 border-t border-gray-200 dark:border-slate-800"
+          >
             <p className="text-sm text-gray-500 max-w-3xl mx-auto dark:text-slate-500">
               ConnectToCare is an academic project developed to explore digital
               implementations of validated clinical screening instruments and
               care coordination pathways.
             </p>
-          </div>
+          </motion.div>
 
-        </div>
+        </motion.div>
       </section>
-    </motion.main>
+    </div>
   );
 }

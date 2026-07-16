@@ -1,4 +1,5 @@
 import { Brain } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export function Footer() {
   const footerHeading =
@@ -6,6 +7,26 @@ export function Footer() {
 
   const footerText =
     "text-sm text-slate-500 dark:text-slate-400";
+
+  const linkClass =
+    "text-sm text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors";
+
+  const footerLinks = {
+    Resources: [
+      { label: "Autism Screening", to: "/assessment/autism" },
+      { label: "ADHD Screening", to: "/assessment/adhd" },
+      { label: "Detailed Assessment", to: "/detection/detailed" },
+    ],
+    Support: [
+      { label: "Autism Support", to: "/autism" },
+      { label: "ADHD Support", to: "/adhd" },
+      { label: "Dashboard", to: "/dashboard" },
+    ],
+    Legal: [
+      { label: "Privacy Policy", to: "/privacy" },
+      { label: "Terms of Use", to: "/terms" },
+    ],
+  };
 
   return (
     <footer className="border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
@@ -26,9 +47,18 @@ export function Footer() {
 
         {/* Links */}
         <div className="grid flex-1 grid-cols-2 gap-8 sm:grid-cols-3">
-          {["Resources", "Support", "Legal"].map((section) => (
+          {Object.entries(footerLinks).map(([section, links]) => (
             <div key={section}>
               <h3 className={footerHeading}>{section}</h3>
+              <ul className="mt-3 space-y-2">
+                {links.map((link) => (
+                  <li key={link.label}>
+                    <Link to={link.to} className={linkClass}>
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>

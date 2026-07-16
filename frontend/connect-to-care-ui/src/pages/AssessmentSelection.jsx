@@ -1,5 +1,19 @@
 import { Brain, Zap, ArrowRight, Timer } from "lucide-react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+
+const container = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.06 } },
+};
+
+const cardVariant = {
+  hidden: { opacity: 0, y: 14 },
+  visible: {
+    opacity: 1, y: 0,
+    transition: { duration: 0.25, ease: "easeOut" },
+  },
+};
 
 export default function AssessmentSelection() {
   const assessments = [
@@ -27,7 +41,12 @@ export default function AssessmentSelection() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 px-4 py-16">
       <div className="max-w-5xl mx-auto">
 
-        <div className="text-center mb-14">
+        <motion.div
+          className="text-center mb-14"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25 }}
+        >
           <h1 className="text-4xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
             Choose an Assessment
           </h1>
@@ -35,17 +54,25 @@ export default function AssessmentSelection() {
             Select the assessment that best matches your concerns. Each
             screening provides personalized insights and recommendations.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <motion.div
+          className="grid md:grid-cols-2 gap-8"
+          initial="hidden"
+          animate="visible"
+          variants={container}
+        >
           {assessments.map((assessment) => {
             const Icon = assessment.icon;
             const isEmerald = assessment.color === "emerald";
 
             return (
-              <div
+              <motion.div
                 key={assessment.title}
-                className="group bg-white dark:bg-gray-900 rounded-3xl shadow-sm dark:shadow-none border border-gray-200 dark:border-gray-700 p-8 hover:shadow-xl dark:hover:shadow-black/40 transition-all duration-300 hover:-translate-y-1"
+                variants={cardVariant}
+                whileHover={{ y: -3, scale: 1.01 }}
+                transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                className="group bg-white dark:bg-gray-900 rounded-3xl shadow-sm dark:shadow-none border border-gray-200 dark:border-gray-700 p-8 hover:shadow-xl dark:hover:shadow-black/40 transition-shadow duration-200"
               >
                 {/* Icon */}
                 <div
@@ -94,7 +121,7 @@ export default function AssessmentSelection() {
 
                   <Link
                     to={assessment.route}
-                    className={`flex items-center gap-2 px-8 py-2.5 rounded-xl text-white transition ${
+                    className={`flex items-center gap-2 px-8 py-2.5 rounded-xl text-white transition-colors ${
                       isEmerald
                         ? "bg-emerald-600 hover:bg-emerald-700"
                         : "bg-blue-600 hover:bg-blue-700"
@@ -104,10 +131,10 @@ export default function AssessmentSelection() {
                     <ArrowRight size={18} />
                   </Link>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </div>
   );
